@@ -23,6 +23,8 @@ Complète le `CLAUDE.md` global d'Axel. La spec de référence est [spec.md](spe
 - `npm run dev` : serveur de dev sur localhost.
 - `npm run build` : build de production.
 - `npm run lint` : vérification du code.
+- `npm test` : tests Vitest (règle de statut, API simulée).
+- Ajouter `?fail=1` à l'URL fait échouer tous les appels de l'API simulée (`?fail=0.3` : 30 % des appels).
 
 Node est installé dans `~/.local/node` (ajouté au PATH dans `~/.zshrc`).
 

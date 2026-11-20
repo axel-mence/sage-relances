@@ -119,9 +119,11 @@ interface Client {
 ### Règle de statut (calculée, jamais stockée)
 
 1. Toutes les pièces reçues → `complet`
-2. Sinon, échéance dépassée → `en_retard`
-3. Sinon, dernière relance il y a moins de 3 jours → `relancee`
+2. Sinon, dernière relance il y a moins de 3 jours → `relancee`
+3. Sinon, échéance dépassée → `en_retard`
 4. Sinon → `en_attente`
+
+La relance récente passe avant le retard (décision du 21/11/2026) : sinon, relancer un client en retard ne changerait pas son statut, ce qui contredit le parcours et les critères d'acceptation. Sans réponse du client sous 3 jours, il redevient « En retard ».
 
 ### API simulée
 

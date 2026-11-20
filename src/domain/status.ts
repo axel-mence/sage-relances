@@ -1,0 +1,47 @@
+import type { Client, DossierStatus, Relance } from './types'
+
+// Une relance compte comme « récente » pendant 3 jours (spec, section 9)
+export const RELANCE_RECENTE_JOURS = 3
+
+const JOUR_MS = 24 * 60 * 60 * 1000
+
+// Date du jour au format AAAA-MM-JJ, en heure locale (pour comparer avec l'échéance)
+export function toDateKey(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+export function piecesManquantes(client: Client) {
+  return client.pieces.filter((piece) => piece.statut === 'manquante')
+}
+
+export function derniereRelance(client: Client): Relance | undefined {
+  return [...client.relances].sort((a, b) => b.date.localeCompare(a.date))[0]
+}
+
+/*
+  Règle de statut, appliquée dans cet ordre :
+  1. Toutes les pièces reçues → complet
+  2. Relance il y a moins de 3 jours → relancee
+  3. Échéance dépassée → en_retard
+  4. Sinon → en_attente
+
+  Écart assumé avec l'ordre de la spec (qui met le retard avant la relance) :
+  sans ça, relancer un client en retard ne changerait pas son statut, ce qui contredit
+  le parcours et les critères d'acceptation (« Relancer » passe le statut à « Relancée »).
+*/
+export function computeStatus(client: Client, now: Date): DossierStatus {
+  if (piecesManquantes(client).length === 0) return 'complet'
+
+  const relance = derniereRelance(client)
+  if (relance && now.getTime() - new Date(relance.date).getTime() < RELANCE_RECENTE_JOURS * JOUR_MS) {
+    return 'relancee'
+  }
+
+  // Comparaison de chaînes AAAA-MM-JJ : l'échéance est dépassée le lendemain du jour J
+  if (client.echeance < toDateKey(now)) return 'en_retard'
+
+  return 'en_attente'
+}
