@@ -7,6 +7,15 @@ import { StatusBadge } from './status-badge'
 type ClientTableProps = {
   clients: ClientView[]
   now: Date
+  onRelancer: (client: ClientView) => void
+  // Clients dont la relance est en cours d'envoi (bouton en chargement)
+  pendingIds: Set<string>
+}
+
+type RelancerButtonProps = {
+  client: ClientView
+  pending: boolean
+  onRelancer: (client: ClientView) => void
 }
 
 // Libellés des pièces manquantes d'un client, pour le résumé
@@ -41,16 +50,23 @@ function PiecesManquantes({ client }: { client: ClientView }) {
   )
 }
 
-// Bouton « Relancer » : inactif si aucune pièce ne manque (spec, section 8). Branché à l'étape 6.
-function RelancerButton({ client }: { client: ClientView }) {
+// Bouton « Relancer » : inactif si aucune pièce ne manque, en chargement pendant l'envoi (spec, section 8)
+function RelancerButton({ client, pending, onRelancer }: RelancerButtonProps) {
   return (
-    <Button size="sm" variant="secondary" disabled={client.nbManquantes === 0} aria-label={`Relancer ${client.nom}`}>
+    <Button
+      size="sm"
+      variant="secondary"
+      disabled={client.nbManquantes === 0}
+      loading={pending}
+      onClick={() => onRelancer(client)}
+      aria-label={`Relancer ${client.nom}`}
+    >
       Relancer
     </Button>
   )
 }
 
-export function ClientTable({ clients, now }: ClientTableProps) {
+export function ClientTable({ clients, now, onRelancer, pendingIds }: ClientTableProps) {
   return (
     <>
       {/* Grand écran : vrai tableau */}
@@ -82,7 +98,7 @@ export function ClientTable({ clients, now }: ClientTableProps) {
                 <td className="px-3 py-3 whitespace-nowrap"><Echeance client={client} now={now} /></td>
                 <td className="px-3 py-3"><StatusBadge status={client.statut} /></td>
                 <td className="px-3 py-3 whitespace-nowrap text-secondary">{formatRelatif(client.derniereRelance, now)}</td>
-                <td className="px-3 py-3 text-right"><RelancerButton client={client} /></td>
+                <td className="px-3 py-3 text-right"><RelancerButton client={client} pending={pendingIds.has(client.id)} onRelancer={onRelancer} /></td>
               </tr>
             ))}
           </tbody>
@@ -105,7 +121,7 @@ export function ClientTable({ clients, now }: ClientTableProps) {
               <span>
                 Échéance <Echeance client={client} now={now} /> · Relance : {formatRelatif(client.derniereRelance, now)}
               </span>
-              <RelancerButton client={client} />
+              <RelancerButton client={client} pending={pendingIds.has(client.id)} onRelancer={onRelancer} />
             </div>
           </li>
         ))}

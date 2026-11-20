@@ -2,20 +2,48 @@ import { useMemo, useState } from 'react'
 import { api } from '../api/clients-api'
 import { ClientTable } from '../components/client-table'
 import { KpiCard } from '../components/kpi-card'
-import { StatusTabs } from '../components/status-tabs'
-import { TABS, type StatusFilter } from '../domain/filters'
 import { MobileTopBar, Sidebar } from '../components/sidebar'
+import { StatusTabs } from '../components/status-tabs'
+import { Toasts } from '../components/toasts'
+import { TABS, type StatusFilter } from '../domain/filters'
 import { formatDuree, formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
+import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
+import { useNow } from '../hooks/use-now'
+import { useToasts } from '../hooks/use-toasts'
 
 // Écran 01 · Tableau de bord associé (spec, section 7)
 export function Dashboard() {
-  // Date figée à l'ouverture de l'écran, pour que l'en-tête ne change pas d'un rendu à l'autre
-  const [now] = useState(() => new Date())
+  const now = useNow()
   const kpis = useAsync(api.getKpis)
   // On charge tous les clients une fois et on filtre ici : les compteurs des onglets restent justes
   const clients = useAsync(api.getClients)
   const [filter, setFilter] = useState<StatusFilter>('en_retard')
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
+  const toasts = useToasts()
+
+  /*
+    Relance d'un client (parcours, étape 3) :
+    bouton en chargement → appel API → succès : toast, client remplacé (statut « Relancée »), KPI rafraîchis
+                                     → échec : toast d'erreur, rien ne change
+  */
+  async function handleRelancer(client: ClientView) {
+    setPendingIds((ids) => new Set(ids).add(client.id))
+    try {
+      const updated = await api.postRelance(client.id)
+      clients.update((list) => list.map((c) => (c.id === updated.id ? updated : c)))
+      kpis.reload({ silent: true })
+      toasts.show(`Relance envoyée à ${client.nom}`)
+    } catch {
+      toasts.show(`La relance de ${client.nom} n'a pas pu être envoyée. Réessayez.`, 'error')
+    } finally {
+      setPendingIds((ids) => {
+        const next = new Set(ids)
+        next.delete(client.id)
+        return next
+      })
+    }
+  }
 
   const counts = useMemo(() => {
     const list = clients.data ?? []
@@ -80,11 +108,13 @@ export function Dashboard() {
             ) : clients.error ? (
               <p className="text-status-retard">Impossible de récupérer les dossiers</p>
             ) : (
-              <ClientTable clients={visibleClients} now={now} />
+              <ClientTable clients={visibleClients} now={now} onRelancer={handleRelancer} pendingIds={pendingIds} />
             )}
           </div>
         </section>
       </main>
+
+      <Toasts toasts={toasts.toasts} onDismiss={toasts.dismiss} />
     </div>
   )
 }
