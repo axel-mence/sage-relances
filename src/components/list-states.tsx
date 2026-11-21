@@ -42,7 +42,7 @@ export function ListError({ onRetry }: { onRetry: () => void }) {
   )
 }
 
-// Vide : aucun dossier pour la période (un groupe vide l'indique dans la liste elle-même)
+// Vide : aucun dossier pour la période (un filtre sans résultat est géré par ListNoResult)
 export function ListEmpty() {
   return (
     <div className="flex flex-col items-center gap-2 rounded-md border border-dashed border-border bg-surface px-4 py-12 text-center">
