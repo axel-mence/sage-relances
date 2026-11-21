@@ -23,3 +23,6 @@ export const FILTERS: { value: StatusFilter; label: string }[] = [
   { value: 'relancee', label: 'Relancés' },
   { value: 'complet', label: 'Complets' },
 ]
+
+// Ordre d'urgence pour le tri de la liste : ce qui brûle d'abord, ce qui est réglé en dernier
+export const URGENCE: DossierStatus[] = ['en_retard', 'en_attente', 'relancee', 'complet']
