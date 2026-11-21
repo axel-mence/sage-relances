@@ -1,0 +1,982 @@
+{
+  "dateReference": "2026-11-20",
+  "collaborateurs": [
+    {
+      "id": "c1",
+      "nom": "Sophie Durand"
+    },
+    {
+      "id": "c2",
+      "nom": "Karim Benali"
+    },
+    {
+      "id": "c3",
+      "nom": "Julie Moreau"
+    },
+    {
+      "id": "c4",
+      "nom": "Thomas Petit"
+    },
+    {
+      "id": "c5",
+      "nom": "Inès Garnier"
+    },
+    {
+      "id": "c6",
+      "nom": "Lucas Robert"
+    }
+  ],
+  "clients": [
+    {
+      "id": "cl01",
+      "nom": "Boulangerie Les Blés d'Or",
+      "collaborateurId": "c1",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-18",
+      "pieces": [
+        {
+          "id": "cl01-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl01-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-16"
+        },
+        {
+          "id": "cl01-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl01-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl01-p5",
+          "libelle": "Relevé carte bancaire octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl01-r1",
+          "date": "2026-11-11T10:00:00Z",
+          "par": "Sophie Durand",
+          "pieces": [
+            "cl01-p3",
+            "cl01-p4",
+            "cl01-p5"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl02",
+      "nom": "Garage Peyrot",
+      "collaborateurId": "c2",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-15",
+      "pieces": [
+        {
+          "id": "cl02-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl02-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-15"
+        },
+        {
+          "id": "cl02-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl02-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl03",
+      "nom": "Atelier Couture Nina",
+      "collaborateurId": "c3",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-19",
+      "pieces": [
+        {
+          "id": "cl03-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl03-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-14"
+        },
+        {
+          "id": "cl03-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl03-r1",
+          "date": "2026-11-08T09:00:00Z",
+          "par": "Système",
+          "pieces": [
+            "cl03-p3"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl04",
+      "nom": "SARL Toitures Vasseur",
+      "collaborateurId": "c4",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-17",
+      "pieces": [
+        {
+          "id": "cl04-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl04-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-13"
+        },
+        {
+          "id": "cl04-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl04-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl04-p5",
+          "libelle": "Relevé carte bancaire octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl04-p6",
+          "libelle": "Tickets Z de caisse octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl04-r1",
+          "date": "2026-11-10T14:00:00Z",
+          "par": "Thomas Petit",
+          "pieces": [
+            "cl04-p3",
+            "cl04-p4",
+            "cl04-p5",
+            "cl04-p6"
+          ],
+          "canal": "mail"
+        },
+        {
+          "id": "cl04-r2",
+          "date": "2026-11-03T11:00:00Z",
+          "par": "Thomas Petit",
+          "pieces": [
+            "cl04-p3",
+            "cl04-p4",
+            "cl04-p5",
+            "cl04-p6"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl05",
+      "nom": "Pharmacie du Marché",
+      "collaborateurId": "c5",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-12",
+      "pieces": [
+        {
+          "id": "cl05-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl05-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-12"
+        },
+        {
+          "id": "cl05-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-07"
+        },
+        {
+          "id": "cl05-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl05-p5",
+          "libelle": "Relevé carte bancaire octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl05-r1",
+          "date": "2026-11-14T16:00:00Z",
+          "par": "Inès Garnier",
+          "pieces": [
+            "cl05-p4",
+            "cl05-p5"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl06",
+      "nom": "Le Comptoir de Lina",
+      "collaborateurId": "c6",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-19",
+      "pieces": [
+        {
+          "id": "cl06-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl06-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-11"
+        },
+        {
+          "id": "cl06-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-05"
+        },
+        {
+          "id": "cl06-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl07",
+      "nom": "Plomberie Ferrand",
+      "collaborateurId": "c1",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-24",
+      "pieces": [
+        {
+          "id": "cl07-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl07-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-10"
+        },
+        {
+          "id": "cl07-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl07-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl08",
+      "nom": "Studio Pilates Aurore",
+      "collaborateurId": "c2",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-24",
+      "pieces": [
+        {
+          "id": "cl08-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl08-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-09"
+        },
+        {
+          "id": "cl08-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl08-r1",
+          "date": "2026-11-15T10:00:00Z",
+          "par": "Karim Benali",
+          "pieces": [
+            "cl08-p3"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl09",
+      "nom": "Cabinet Kiné Lambert",
+      "collaborateurId": "c3",
+      "regimeTva": "trimestrielle",
+      "echeance": "2026-11-30",
+      "pieces": [
+        {
+          "id": "cl09-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl09-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl09-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl09-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl10",
+      "nom": "Épicerie Fine Rossi",
+      "collaborateurId": "c4",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-26",
+      "pieces": [
+        {
+          "id": "cl10-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl10-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-07"
+        },
+        {
+          "id": "cl10-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-12"
+        },
+        {
+          "id": "cl10-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl10-p5",
+          "libelle": "Relevé carte bancaire octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl11",
+      "nom": "Menuiserie Charpentier",
+      "collaborateurId": "c5",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-24",
+      "pieces": [
+        {
+          "id": "cl11-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl11-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-06"
+        },
+        {
+          "id": "cl11-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-10"
+        },
+        {
+          "id": "cl11-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl11-p5",
+          "libelle": "Relevé carte bancaire octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl11-r1",
+          "date": "2026-11-12T09:00:00Z",
+          "par": "Système",
+          "pieces": [
+            "cl11-p4",
+            "cl11-p5"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl12",
+      "nom": "Agence Immo Belle Rive",
+      "collaborateurId": "c6",
+      "regimeTva": "trimestrielle",
+      "echeance": "2026-12-10",
+      "pieces": [
+        {
+          "id": "cl12-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl12-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-05"
+        },
+        {
+          "id": "cl12-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-08"
+        },
+        {
+          "id": "cl12-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl13",
+      "nom": "Fleurs & Sens",
+      "collaborateurId": "c1",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-26",
+      "pieces": [
+        {
+          "id": "cl13-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl13-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl13-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl14",
+      "nom": "Restaurant L'Escale",
+      "collaborateurId": "c2",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-19",
+      "pieces": [
+        {
+          "id": "cl14-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl14-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-03"
+        },
+        {
+          "id": "cl14-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-04"
+        },
+        {
+          "id": "cl14-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl14-p5",
+          "libelle": "Relevé carte bancaire octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl14-r1",
+          "date": "2026-11-19T09:00:00Z",
+          "par": "Karim Benali",
+          "pieces": [
+            "cl14-p4",
+            "cl14-p5"
+          ],
+          "canal": "mail"
+        },
+        {
+          "id": "cl14-r2",
+          "date": "2026-11-12T10:00:00Z",
+          "par": "Karim Benali",
+          "pieces": [
+            "cl14-p4",
+            "cl14-p5"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl15",
+      "nom": "Taxi Moreau",
+      "collaborateurId": "c3",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-24",
+      "pieces": [
+        {
+          "id": "cl15-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl15-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl15-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl15-r1",
+          "date": "2026-11-18T15:00:00Z",
+          "par": "Julie Moreau",
+          "pieces": [
+            "cl15-p3"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl16",
+      "nom": "Librairie Page 9",
+      "collaborateurId": "c4",
+      "regimeTva": "trimestrielle",
+      "echeance": "2026-11-30",
+      "pieces": [
+        {
+          "id": "cl16-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl16-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-16"
+        },
+        {
+          "id": "cl16-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "manquante"
+        },
+        {
+          "id": "cl16-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "manquante"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl16-r1",
+          "date": "2026-11-19T11:00:00Z",
+          "par": "Système",
+          "pieces": [
+            "cl16-p3",
+            "cl16-p4"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl17",
+      "nom": "Coiffure Élégance",
+      "collaborateurId": "c5",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-24",
+      "pieces": [
+        {
+          "id": "cl17-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl17-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-15"
+        },
+        {
+          "id": "cl17-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-13"
+        },
+        {
+          "id": "cl17-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-11"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl18",
+      "nom": "Électricité Bernard",
+      "collaborateurId": "c6",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-18",
+      "pieces": [
+        {
+          "id": "cl18-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl18-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-14"
+        },
+        {
+          "id": "cl18-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-11"
+        },
+        {
+          "id": "cl18-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-08"
+        },
+        {
+          "id": "cl18-p5",
+          "libelle": "Relevé carte bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-05"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl18-r1",
+          "date": "2026-11-08T10:00:00Z",
+          "par": "Lucas Robert",
+          "pieces": [
+            "cl18-p5"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl19",
+      "nom": "Boucherie Delmas",
+      "collaborateurId": "c1",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-26",
+      "pieces": [
+        {
+          "id": "cl19-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl19-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-13"
+        },
+        {
+          "id": "cl19-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-09"
+        },
+        {
+          "id": "cl19-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-05"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl20",
+      "nom": "Auto-école Horizon",
+      "collaborateurId": "c2",
+      "regimeTva": "trimestrielle",
+      "echeance": "2026-11-30",
+      "pieces": [
+        {
+          "id": "cl20-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl20-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-12"
+        },
+        {
+          "id": "cl20-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-07"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl21",
+      "nom": "Ostéo Santé Martin",
+      "collaborateurId": "c3",
+      "regimeTva": "trimestrielle",
+      "echeance": "2026-12-10",
+      "pieces": [
+        {
+          "id": "cl21-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl21-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-11"
+        },
+        {
+          "id": "cl21-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-05"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl22",
+      "nom": "Brasserie du Port",
+      "collaborateurId": "c4",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-24",
+      "pieces": [
+        {
+          "id": "cl22-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl22-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-10"
+        },
+        {
+          "id": "cl22-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-03"
+        },
+        {
+          "id": "cl22-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-11"
+        },
+        {
+          "id": "cl22-p5",
+          "libelle": "Relevé carte bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-04"
+        },
+        {
+          "id": "cl22-p6",
+          "libelle": "Tickets Z de caisse octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-12"
+        }
+      ],
+      "relances": [
+        {
+          "id": "cl22-r1",
+          "date": "2026-11-06T09:00:00Z",
+          "par": "Thomas Petit",
+          "pieces": [
+            "cl22-p6"
+          ],
+          "canal": "mail"
+        }
+      ]
+    },
+    {
+      "id": "cl23",
+      "nom": "Paysages Dubreuil",
+      "collaborateurId": "c5",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-26",
+      "pieces": [
+        {
+          "id": "cl23-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl23-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-09"
+        },
+        {
+          "id": "cl23-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-16"
+        },
+        {
+          "id": "cl23-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-08"
+        }
+      ],
+      "relances": []
+    },
+    {
+      "id": "cl24",
+      "nom": "Opticien Vue Claire",
+      "collaborateurId": "c6",
+      "regimeTva": "mensuelle",
+      "echeance": "2026-11-19",
+      "pieces": [
+        {
+          "id": "cl24-p1",
+          "libelle": "Relevé bancaire octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-17"
+        },
+        {
+          "id": "cl24-p2",
+          "libelle": "Factures d'achat octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-08"
+        },
+        {
+          "id": "cl24-p3",
+          "libelle": "Factures de vente octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-14"
+        },
+        {
+          "id": "cl24-p4",
+          "libelle": "Notes de frais octobre",
+          "statut": "recue",
+          "recueLe": "2026-11-05"
+        }
+      ],
+      "relances": []
+    }
+  ]
+}

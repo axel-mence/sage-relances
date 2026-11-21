@@ -30,7 +30,7 @@ Sage Experience se branche sur les outils existants du cabinet. La feature lit l
 ## 5. Périmètre V1
 
 **Dans la V1**
-- Écran 01 · Tableau de bord associé : KPI + liste des clients filtrable par statut.
+- Écran 01 · Tableau de bord associé : temps gagné, recherche, pastilles d'état + liste des clients groupée par statut (groupes dépliables), avec la complétude de chaque dossier.
 - Écran 03 · Fiche client en panneau latéral : pièces attendues, historique, relance individuelle.
 - Données mockées en JSON, servies comme une API (couche `api/` qui simule le logiciel comptable).
 - Relance simulée : le clic ajoute un événement à l'historique et met à jour le statut, aucun mail réel n'est envoyé.
@@ -44,10 +44,10 @@ Sage Experience se branche sur les outils existants du cabinet. La feature lit l
 
 ## 6. Parcours
 
-1. L'associé ouvre le tableau de bord. Les KPI et l'onglet « En retard » sont visibles d'emblée.
-2. Il change d'onglet de statut pour filtrer la liste (Tous, En retard, En attente, Relancés, Complets).
+1. L'associé ouvre le tableau de bord. Le temps gagné, la recherche et le groupe « En retard » sont visibles d'emblée.
+2. Il ouvre ou replie les groupes de statut (En retard, En attente, Relancés, Complets), clique sur une pastille d'état pour aller au groupe, ou cherche un client ou un collaborateur.
 3. Il clique sur « Relancer » sur une ligne : la relance est enregistrée, un toast confirme, le statut passe à « Relancée ».
-4. Ou il clique sur une ligne : le panneau latéral s'ouvre à droite, la liste reste visible derrière.
+4. Ou il clique sur une ligne ou sur « Voir » : le panneau latéral s'ouvre à droite, la liste reste visible derrière.
 5. Dans le panneau, il voit les pièces attendues (reçues cochées), l'historique, et peut relancer pour les pièces manquantes.
 6. Il ferme le panneau (croix, clic sur le fond, touche Échap).
 
@@ -56,15 +56,18 @@ Sage Experience se branche sur les outils existants du cabinet. La feature lit l
 ### 01 · Tableau de bord associé
 - **Barre latérale** : nom du cabinet, navigation (Tableau de bord actif ; les autres entrées sont visibles mais inactives).
 - **En-tête** : titre « Pièces manquantes », sous-titre période et échéance TVA. Le bouton « Relancer tous les retards » est hors V1 (masqué).
-- **4 cartes KPI** : Dossiers complets (x sur 180) · En retard (rouge) · Relances cette semaine · Temps gagné estimé (vert).
-- **Onglets de statut** avec compteur ; « En retard » sélectionné par défaut.
-- **Tableau** : Client · Collaborateur · Pièces manquantes (nombre + résumé) · Échéance · Statut (badge) · Dernière relance (relative : « Il y a 9 jours », « Jamais ») · bouton « Relancer ».
-- Tri par défaut : échéance la plus proche, puis nombre de pièces manquantes décroissant.
+- **Temps gagné** mis en avant à droite du titre, sans carte (les 3 autres cartes KPI ont été retirées le 21/11/2026, à la demande d'Axel).
+- **Recherche** par nom de client ou de collaborateur (sans tenir compte des accents). Pendant une recherche, seuls les groupes avec des résultats s'affichent, dépliés. La barre de répartition en dégradé (note N2) a été retirée le 21/11/2026, à la demande d'Axel.
+- **Pastilles d'état** cliquables avec compteur : ouvrent le groupe correspondant et font défiler jusqu'à lui.
+- **Groupes de statut dépliables** (DS v2, note N1) à la place des onglets : En retard, En attente, Relancés, Complets (replié par défaut). État ouvert/fermé conservé pendant la session.
+- **Tableau** : Client · Complétude (jauge + % de pièces reçues) · Collaborateur · Pièces manquantes (nombre + résumé) · Échéance · Dernière relance (relative : « Il y a 9 jours », « Jamais ») · boutons « Voir » et « Relancer ». Le statut est porté par l'en-tête du groupe.
+- Tri dans chaque groupe : échéance la plus proche, puis nombre de pièces manquantes décroissant.
 
 ### 03 · Fiche client (panneau latéral)
 - Largeur 440 px, ancré à droite, fond légèrement assombri derrière.
 - En-tête : nom du client, collaborateur, régime de TVA, croix.
 - Badge de statut + échéance (« dépassée de 2 jours » si en retard).
+- Complétude : « n pièces reçues sur N » + jauge et pourcentage.
 - **Pièces attendues de la période** : liste avec case cochée si reçue (texte grisé).
 - **Historique des relances** : timeline du plus récent au plus ancien.
 - Actions : « Relancer (n pièces) » (primaire) · « Assigner » (secondaire, désactivé en V1).
@@ -73,7 +76,7 @@ Sage Experience se branche sur les outils existants du cabinet. La feature lit l
 
 | Élément | Vide | Chargement | Erreur | Succès |
 | --- | --- | --- | --- | --- |
-| Liste | « Aucun client dans cet onglet » + lien vers « Tous » | Squelettes de lignes (6) | Bandeau « Impossible de récupérer les dossiers » + Réessayer | Lignes affichées |
+| Liste | « Aucun dossier pour cette période » (un groupe vide affiche « Aucun client dans ce groupe ») | Squelettes de lignes (6) | Bandeau « Impossible de récupérer les dossiers » + Réessayer | Lignes affichées |
 | KPI | « 0 » | Squelettes | « Indisponible » | Valeurs |
 | Relance | Bouton désactivé si 0 pièce manquante | Bouton en chargement | Toast d'erreur, statut inchangé | Toast « Relance envoyée à {client} », statut « Relancée », événement ajouté |
 | Panneau | Pièces : « Toutes les pièces sont reçues » | Squelette | Message + Réessayer | Contenu |
@@ -119,9 +122,11 @@ interface Client {
 ### Règle de statut (calculée, jamais stockée)
 
 1. Toutes les pièces reçues → `complet`
-2. Sinon, échéance dépassée → `en_retard`
-3. Sinon, dernière relance il y a moins de 3 jours → `relancee`
+2. Sinon, dernière relance il y a moins de 3 jours → `relancee`
+3. Sinon, échéance dépassée → `en_retard`
 4. Sinon → `en_attente`
+
+La relance récente passe avant le retard (décision du 21/11/2026) : sinon, relancer un client en retard ne changerait pas son statut, ce qui contredit le parcours et les critères d'acceptation. Sans réponse du client sous 3 jours, il redevient « En retard ».
 
 ### API simulée
 
@@ -184,13 +189,14 @@ Un commit par étape au minimum, message au format `feat(scope): description`.
 
 ## 13. Critères d'acceptation
 
-- [ ] À l'ouverture, l'onglet « En retard » s'affiche avec le bon compteur.
-- [ ] Les compteurs des onglets correspondent aux lignes affichées.
+- [ ] À l'ouverture, les groupes En retard, En attente et Relancés sont dépliés, Complets est replié.
+- [ ] Les compteurs des groupes et des pastilles correspondent aux lignes affichées.
+- [ ] La complétude de chaque dossier correspond aux pièces reçues sur les pièces attendues.
 - [ ] « Relancer » sur une ligne passe le statut à « Relancée », met « Dernière relance » à « À l'instant » et ajoute un événement visible dans le panneau.
 - [ ] Un client complet n'a pas de bouton « Relancer » actif.
 - [ ] Le panneau s'ouvre au clic sur une ligne et se ferme avec la croix, le fond ou Échap.
 - [ ] Les états vide, chargement et erreur sont visibles (via `?fail=1` pour l'erreur).
-- [ ] Contraste AA sur textes et badges, navigation clavier sur les onglets, les lignes et les boutons.
+- [ ] Contraste AA sur textes et badges, navigation clavier sur les groupes, les lignes et les boutons.
 - [ ] La CI passe (lint, tests, build) et la PR a une preview.
 
 ## 14. Risques et questions ouvertes
