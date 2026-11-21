@@ -7,9 +7,9 @@ import { MobileTopBar, Sidebar } from '../components/sidebar'
 import { StatusPills } from '../components/status-pills'
 import { TimeSaved } from '../components/time-saved'
 import { Toasts } from '../components/toasts'
-import { GROUPS, groupId } from '../domain/filters'
+import { FILTERS, type StatusFilter } from '../domain/filters'
 import { formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
-import type { ClientView, DossierStatus } from '../domain/types'
+import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useNow } from '../hooks/use-now'
 import { useOpenGroups } from '../hooks/use-open-groups'
@@ -24,6 +24,8 @@ export function Dashboard() {
   const clients = useAsync(api.getClients)
   const groups = useOpenGroups()
   const [query, setQuery] = useState('')
+  // Filtre de statut (pastilles d'un clic) : « Tous » par défaut
+  const [filter, setFilter] = useState<StatusFilter>('tous')
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
   // Client affiché dans le panneau latéral (aucun si fermé)
   const [selectedId, setSelectedId] = useState<string>()
@@ -55,32 +57,24 @@ export function Dashboard() {
     }
   }
 
-  // Nombre de clients par statut : alimente la barre de répartition et les en-têtes de groupe
+  // Nombre de clients par filtre (pastilles), calculé sur toute la liste
   const counts = useMemo(() => {
     const list = clients.data ?? []
-    return Object.fromEntries(GROUPS.map((g) => [g.status, list.filter((c) => c.statut === g.status).length])) as Record<
-      DossierStatus,
-      number
-    >
+    return Object.fromEntries(
+      FILTERS.map((f) => [f.value, f.value === 'tous' ? list.length : list.filter((c) => c.statut === f.value).length]),
+    ) as Record<StatusFilter, number>
   }, [clients.data])
 
   // Recherche sans tenir compte des majuscules ni des accents (« ines » trouve « Inès »)
   const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   const search = normalize(query.trim())
+  // Filtre de statut puis recherche
   const visibleClients = (clients.data ?? []).filter(
-    (c) => !search || normalize(c.nom).includes(search) || normalize(c.collaborateur).includes(search),
+    (c) =>
+      (filter === 'tous' || c.statut === filter) &&
+      (!search || normalize(c.nom).includes(search) || normalize(c.collaborateur).includes(search)),
   )
 
-  // Pastille d'état : ouvre le groupe puis fait défiler jusqu'à lui
-  function goToGroup(status: DossierStatus) {
-    groups.openGroup(status)
-    // Après l'affichage du groupe ouvert ; l'id mobile est utilisé quand le tableau desktop est masqué
-    setTimeout(() => {
-      const desktop = document.getElementById(groupId(status))
-      const target = desktop?.offsetParent ? desktop : document.getElementById(`${groupId(status)}-mobile`)
-      target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 0)
-  }
 
   // « Réessayer » recharge la liste, et les KPI s'ils étaient aussi en erreur
   function handleRetry() {
@@ -115,7 +109,7 @@ export function Dashboard() {
         {/* Recherche + pastilles d'état (raccourcis vers les groupes) */}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <SearchField value={query} onChange={setQuery} />
-          {clients.data && <StatusPills counts={counts} onSelect={goToGroup} />}
+          {clients.data && <StatusPills counts={counts} value={filter} onChange={setFilter} />}
         </div>
 
         <section aria-label="Clients par statut" className="flex flex-col gap-4">
@@ -128,11 +122,17 @@ export function Dashboard() {
             ) : clients.data?.length === 0 ? (
               <ListEmpty />
             ) : visibleClients.length === 0 ? (
-              <ListNoResult query={query.trim()} onClear={() => setQuery('')} />
+              <ListNoResult
+                query={query.trim()}
+                onClear={() => {
+                  setQuery('')
+                  setFilter('tous')
+                }}
+              />
             ) : (
               <ClientTable
                 clients={visibleClients}
-                searching={!!search}
+                searching={!!search || filter !== 'tous'}
                 now={now}
                 openGroups={groups.open}
                 onToggleGroup={groups.toggle}

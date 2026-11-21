@@ -1,8 +1,8 @@
-import { GROUPS } from '../domain/filters'
-import type { DossierStatus } from '../domain/types'
+import { FILTERS, type StatusFilter } from '../domain/filters'
 
-// Couleur du point de chaque état : celle du badge de statut correspondant (suit le mode clair ou sombre)
-const DOT: Record<DossierStatus, string> = {
+// Couleur du point de chaque statut : celle du badge correspondant (suit le mode clair ou sombre)
+const DOT: Record<StatusFilter, string | null> = {
+  tous: null,
   en_retard: 'bg-status-retard',
   en_attente: 'bg-status-attente',
   relancee: 'bg-status-relancee',
@@ -10,28 +10,40 @@ const DOT: Record<DossierStatus, string> = {
 }
 
 type StatusPillsProps = {
-  counts: Record<DossierStatus, number>
-  // Ouvre le groupe du statut choisi dans la liste et fait défiler jusqu'à lui
-  onSelect: (status: DossierStatus) => void
+  // Nombre de clients pour chaque filtre
+  counts: Record<StatusFilter, number>
+  value: StatusFilter
+  onChange: (value: StatusFilter) => void
 }
 
-// Pastilles d'état cliquables (un raccourci vers chaque groupe de la liste)
-export function StatusPills({ counts, onSelect }: StatusPillsProps) {
+/*
+  Pastilles de filtre d'un clic (format « filtres » de Stripe) : Tous, En retard, En attente, Relancés, Complets.
+  La pastille active est encadrée par l'accent ; aria-pressed annonce laquelle est choisie.
+*/
+export function StatusPills({ counts, value, onChange }: StatusPillsProps) {
   return (
-    <ul className="flex flex-wrap gap-2" aria-label="Aller au groupe">
-      {GROUPS.map((group) => (
-        <li key={group.status}>
+    <div role="group" aria-label="Filtrer par statut" className="flex flex-wrap gap-2">
+      {FILTERS.map((filter) => {
+        const active = filter.value === value
+        const dot = DOT[filter.value]
+        return (
           <button
+            key={filter.value}
             type="button"
-            onClick={() => onSelect(group.status)}
-            className="flex h-9 cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface px-3 text-label text-secondary transition-colors hover:border-secondary hover:text-primary"
+            aria-pressed={active}
+            onClick={() => onChange(filter.value)}
+            className={`flex h-9 cursor-pointer items-center gap-2 rounded-sm border px-3 text-label transition-colors ${
+              active
+                ? 'border-accent bg-surface-2 text-primary ring-1 ring-accent ring-inset'
+                : 'border-border bg-surface text-secondary hover:border-secondary hover:text-primary'
+            }`}
           >
-            <span aria-hidden="true" className={`size-2 rounded-full ${DOT[group.status]}`} />
-            {group.label}
-            <span className="text-primary tabular-nums">{counts[group.status]}</span>
+            {dot && <span aria-hidden="true" className={`size-2 rounded-full ${dot}`} />}
+            {filter.label}
+            <span className="text-primary tabular-nums">{counts[filter.value]}</span>
           </button>
-        </li>
-      ))}
-    </ul>
+        )
+      })}
+    </div>
   )
 }
