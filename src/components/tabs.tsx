@@ -78,12 +78,13 @@ type TabPanelProps = {
   idPrefix: string
   value: string
   children: ReactNode
+  className?: string
 }
 
 // Contenu d'un onglet, relié à son onglet pour les lecteurs d'écran
-export function TabPanel({ idPrefix, value, children }: TabPanelProps) {
+export function TabPanel({ idPrefix, value, children, className = '' }: TabPanelProps) {
   return (
-    <div role="tabpanel" id={panelId(idPrefix, value)} aria-labelledby={tabId(idPrefix, value)}>
+    <div role="tabpanel" tabIndex={0} id={panelId(idPrefix, value)} aria-labelledby={tabId(idPrefix, value)} className={className}>
       {children}
     </div>
   )
