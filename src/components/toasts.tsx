@@ -6,8 +6,9 @@ type ToastsProps = {
 }
 
 const TONES = {
-  success: 'bg-primary text-white',
-  error: 'bg-status-retard text-white',
+  // Toast « inversé » : fond clair sur l'app sombre (et l'inverse en mode clair)
+  success: 'bg-inverse text-on-inverse',
+  error: 'bg-status-retard text-on-inverse',
 }
 
 /*
@@ -31,7 +32,7 @@ export function Toasts({ toasts, onDismiss }: ToastsProps) {
             type="button"
             onClick={() => onDismiss(toast.id)}
             aria-label="Fermer le message"
-            className="cursor-pointer rounded-sm px-1 text-white/80 hover:text-white"
+            className="cursor-pointer rounded-sm px-1 opacity-80 hover:opacity-100"
           >
             ✕
           </button>

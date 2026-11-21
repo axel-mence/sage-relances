@@ -86,8 +86,8 @@ function PanelContent({ client, now, pending, onRelancer, onClose }: PanelConten
       {/* En-tête */}
       <header className="flex items-start justify-between gap-4 border-b border-border p-6">
         <div className="flex min-w-0 flex-col gap-1">
-          <h2 id={TITLE_ID} className="text-section">{client.nom}</h2>
-          <p className="text-caption text-secondary">
+          <h2 id={TITLE_ID} className="font-display text-section">{client.nom}</h2>
+          <p className="text-caption text-muted">
             {client.collaborateur} · TVA {client.regimeTva}
           </p>
         </div>
@@ -118,27 +118,26 @@ function PanelContent({ client, now, pending, onRelancer, onClose }: PanelConten
             Pièces attendues · {formatPeriode(now)}
           </h3>
           {client.nbManquantes === 0 && (
-            <p className="rounded-md bg-accent-subtle px-3 py-2 text-label text-accent-strong">Toutes les pièces sont reçues</p>
+            <p className="rounded-sm bg-status-recue-bg px-4 py-3 text-label text-status-recue">Toutes les pièces sont reçues</p>
           )}
-          <ul className="flex flex-col divide-y divide-border rounded-lg border border-border">
+          {/*
+            Format « Ligne pièce » du DS Nudge v2 : fond surface-2, angles de 8 px, point de 8 px
+            orange-rouge si la pièce manque, vert si elle est reçue. L'état est aussi écrit en toutes lettres.
+          */}
+          <ul className="flex flex-col gap-2">
             {client.pieces.map((piece) => {
               const recue = piece.statut === 'recue'
               return (
-                <li key={piece.id} className="flex items-center gap-3 px-3 py-2.5">
-                  {/* Case visuelle : l'état est aussi donné en texte pour les lecteurs d'écran */}
+                <li key={piece.id} className="flex items-center gap-3 rounded-sm bg-surface-2 px-4 py-3">
                   <span
                     aria-hidden="true"
-                    className={`grid size-4 shrink-0 place-items-center rounded-sm border text-caption leading-none ${
-                      recue ? 'border-accent-strong bg-accent-strong text-white' : 'border-border bg-surface'
-                    }`}
-                  >
-                    {recue && '✓'}
-                  </span>
-                  <span className={`flex-1 ${recue ? 'text-muted' : 'text-primary'}`}>
+                    className={`size-2 shrink-0 rounded-full ${recue ? 'bg-status-recue' : 'bg-status-retard'}`}
+                  />
+                  <span className={`flex-1 text-label ${recue ? 'text-muted' : 'text-primary'}`}>
                     {piece.libelle}
                     <span className="sr-only">{recue ? ' : reçue' : ' : manquante'}</span>
                   </span>
-                  <span className="text-caption text-secondary">
+                  <span className={`text-label whitespace-nowrap ${recue ? 'text-muted' : 'text-status-retard'}`}>
                     {recue ? (piece.recueLe ? `Reçue le ${formatEcheance(piece.recueLe)}` : 'Reçue') : 'Manquante'}
                   </span>
                 </li>
@@ -159,7 +158,7 @@ function PanelContent({ client, now, pending, onRelancer, onClose }: PanelConten
                   {index < relances.length - 1 && (
                     <span aria-hidden="true" className="absolute top-3 bottom-0 left-[3.5px] w-px bg-border" />
                   )}
-                  <span aria-hidden="true" className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />
+                  <span aria-hidden="true" className="mt-1.5 size-2 shrink-0 rounded-full bg-accent" />
                   <div className="flex flex-col gap-0.5">
                     <span className="text-label text-primary">
                       Relance par mail · {relance.pieces.length} pièce{relance.pieces.length > 1 ? 's' : ''}
@@ -205,12 +204,12 @@ function PanelSkeleton({ onClose }: { onClose: () => void }) {
     <div aria-busy="true" className="flex flex-col gap-6 p-6">
       <div className="flex items-start justify-between">
         <h2 id={TITLE_ID} className="sr-only">Chargement de la fiche client</h2>
-        <span className="h-6 w-48 animate-pulse rounded-sm bg-page" />
+        <span className="h-7 w-48 animate-pulse rounded-sm bg-surface-2" />
         <CloseButton onClose={onClose} />
       </div>
-      <span className="h-5 w-32 animate-pulse rounded-sm bg-page" />
-      <span className="h-40 animate-pulse rounded-lg bg-page" />
-      <span className="h-24 animate-pulse rounded-lg bg-page" />
+      <span className="h-7 w-32 animate-pulse rounded-xs bg-surface-2" />
+      <span className="h-40 animate-pulse rounded-md bg-surface-2" />
+      <span className="h-24 animate-pulse rounded-md bg-surface-2" />
     </div>
   )
 }
@@ -219,7 +218,7 @@ function PanelError({ onClose, onRetry }: { onClose: () => void; onRetry: () => 
   return (
     <div className="flex flex-col gap-4 p-6">
       <div className="flex items-start justify-between gap-4">
-        <h2 id={TITLE_ID} className="text-section">Fiche indisponible</h2>
+        <h2 id={TITLE_ID} className="font-display text-section">Fiche indisponible</h2>
         <CloseButton onClose={onClose} />
       </div>
       <p className="text-secondary">Impossible de récupérer ce dossier pour le moment.</p>

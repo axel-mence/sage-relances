@@ -2,13 +2,25 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/nudge-mark.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Typo du DS : Inter (400, 500, 600) -->
+    <!--
+      Thème : clair par défaut. Si l'utilisateur a choisi le mode sombre (pastille clair / sombre),
+      on l'applique ici, avant l'affichage, pour éviter un flash blanc au chargement.
+      Même clé que dans src/hooks/use-theme.ts.
+    -->
+    <script>
+      try {
+        if (localStorage.getItem('nudge:theme') === 'dark') document.documentElement.classList.add('theme-dark')
+      } catch {
+        /* Stockage bloqué : on reste en clair */
+      }
+    </script>
+    <!-- Typo Nudge : Inter (interface) et Sora (titres, chiffres clés, logo) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-    <title>Pièces manquantes · Sage Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet" />
+    <title>Pièces manquantes · Nudge</title>
   </head>
   <body>
     <div id="root"></div>

@@ -7,14 +7,22 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   loading?: boolean
 }
 
+/*
+  Bouton du DS Nudge v2 (composant Figma « Bouton ») :
+  - principal : fond accent (noir en clair, citron en sombre), texte accent-on, Inter SemiBold 15
+  - secondaire : filet border, texte principal, fond transparent
+  Angles de 8 px (radius sm) pour les 2.
+*/
 const VARIANTS = {
-  primary: 'bg-accent-strong text-white hover:bg-accent-strong-hover',
-  secondary: 'bg-surface text-primary border border-border hover:bg-page',
+  primary: 'bg-accent text-accent-on hover:bg-accent-hover',
+  secondary: 'border border-border text-primary hover:bg-surface-2',
 }
 
 const SIZES = {
+  // Version compacte pour les lignes de la liste
   sm: 'h-8 px-3 text-label',
-  md: 'h-10 px-4 text-label',
+  // Taille du DS : 24 px × 12 px de marge intérieure
+  md: 'px-6 py-3 text-button',
 }
 
 export function Button({
@@ -34,7 +42,7 @@ export function Button({
       type={type}
       disabled={isDisabled}
       aria-busy={loading || undefined}
-      className={`inline-flex items-center justify-center gap-2 rounded-md whitespace-nowrap transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-sm whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...rest}
     >
       {loading && (

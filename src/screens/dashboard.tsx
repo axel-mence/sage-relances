@@ -99,7 +99,7 @@ export function Dashboard() {
         {/* En-tête : titre à gauche, temps gagné mis en avant à droite (en dessous sur mobile) */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex flex-col gap-1">
-            <h1 className="text-title">Pièces manquantes</h1>
+            <h1 className="font-display text-title">Pièces manquantes</h1>
             <p className="text-secondary">
               Pièces de {formatPeriode(now)} · Échéance TVA le {formatJourMois(prochaineEcheanceTva(now))}
             </p>

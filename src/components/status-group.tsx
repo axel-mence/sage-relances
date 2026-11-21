@@ -24,7 +24,8 @@ export function StatusGroupHeader({ status, label, count, open, onToggle, contro
       aria-expanded={open}
       aria-controls={controlsId}
       aria-label={`${label}, ${count} dossier${count > 1 ? 's' : ''}`}
-      className="flex w-full cursor-pointer items-center gap-3 bg-page px-4 py-2.5 text-left hover:bg-border/60"
+      // Contour de focus à l'intérieur du bouton (-outline-offset-2) : sinon il est rogné par le tableau
+      className="flex w-full cursor-pointer items-center gap-3 rounded-sm px-2 py-2 text-left -outline-offset-2 hover:bg-surface-2"
     >
       {/* Chevron : pointe à droite fermé, vers le bas ouvert */}
       <svg

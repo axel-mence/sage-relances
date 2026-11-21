@@ -1,10 +1,13 @@
 import { niveauCompletude, type NiveauCompletude } from '../domain/status'
 
-// Couleur par seuil (couleurs de statut du DS) : jauge et texte, texte au contraste AA sur blanc
+/*
+  Couleur par seuil (jauge et texte) avec les couleurs de statut du DS, qui suivent le mode clair ou sombre :
+  rouge-orangé « retard » sous 50 %, jaune « attente » de 50 à 79 %, vert « reçue » à partir de 80 %.
+*/
 const COULEURS: Record<NiveauCompletude, { jauge: string; texte: string }> = {
   faible: { jauge: 'bg-status-retard', texte: 'text-status-retard' },
   moyen: { jauge: 'bg-status-attente', texte: 'text-status-attente' },
-  bon: { jauge: 'bg-accent', texte: 'text-accent-strong' },
+  bon: { jauge: 'bg-status-recue', texte: 'text-status-recue' },
 }
 
 type CompletudeProps = {
@@ -26,11 +29,11 @@ export function Completude({ value, size = 'sm' }: CompletudeProps) {
       <span
         aria-hidden="true"
         // Petite jauge masquée entre 1024 et 1280 px (tableau trop étroit) : le pourcentage reste
-        className={`overflow-hidden rounded-full bg-border ${size === 'lg' ? 'h-2 flex-1' : 'h-1.5 w-12 lg:hidden xl:block'}`}
+        className={`overflow-hidden rounded-full bg-surface-2 ${size === 'lg' ? 'h-2 flex-1' : 'h-1.5 w-12 lg:hidden xl:block'}`}
       >
         <span className={`block h-full rounded-full ${couleur.jauge}`} style={{ width: `${value}%` }} />
       </span>
-      <span className={`tabular-nums ${size === 'lg' ? 'text-label' : 'w-11 text-right'} ${couleur.texte}`}>
+      <span className={`tabular-nums whitespace-nowrap ${size === 'lg' ? 'text-label' : 'w-12 text-right'} ${couleur.texte}`}>
         {value} %<span className="sr-only"> de pièces reçues</span>
       </span>
     </span>
