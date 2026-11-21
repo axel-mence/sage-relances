@@ -4,7 +4,6 @@ import { clientSlugFromPath, historyState, isClientsPath, usePath } from './hook
 import { ClientPage } from './screens/client-page'
 import { ClientsDirectory } from './screens/clients-directory'
 import { Dashboard } from './screens/dashboard'
-import { DsPreview } from './screens/ds-preview'
 
 /*
   Coque de l'application : barre latérale (ou barre du haut sur mobile) + page courante.
@@ -39,8 +38,6 @@ function Shell() {
 }
 
 function App() {
-  // TEMPORAIRE (brief Nudge, étape 3) : ?ds affiche la page de test des composants
-  if (new URLSearchParams(window.location.search).has('ds')) return <DsPreview />
   return <Shell />
 }
 
