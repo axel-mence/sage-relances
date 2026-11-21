@@ -10,14 +10,23 @@
   Les données vivent en mémoire pendant la session : un rechargement de page repart du JSON.
 */
 import rawData from '../data/clients.json'
+import { composeRelance, type MailRelance } from '../domain/mail'
 import { computeStatus, derniereRelance, piecesManquantes } from '../domain/status'
-import type { Client, ClientView, Collaborateur, DossierStatus, Kpis } from '../domain/types'
+import type { Client, ClientView, Collaborateur, DossierStatus, Kpis, Relance } from '../domain/types'
+
+/*
+  Le JSON ne stocke pas le texte des relances passées (il serait trop long à écrire à la main) :
+  il est reconstitué au chargement avec le modèle de mail actuel (voir withMails).
+*/
+type RawClient = Omit<Client, 'relances'> & { relances: Omit<Relance, 'objet' | 'message'>[] }
 
 type Dataset = {
   dateReference: string // date à laquelle le jeu de données a été écrit
   collaborateurs: Collaborateur[]
-  clients: Client[]
+  clients: RawClient[]
 }
+
+type Database = Omit<Dataset, 'clients'> & { clients: Client[] }
 
 // Les 24 clients représentent un cabinet de 180 dossiers : les KPI sont multipliés par ce facteur
 export const TOTAL_DOSSIERS_CABINET = 180
@@ -42,6 +51,27 @@ type ApiOptions = {
   latency?: [number, number]
   // Probabilité d'échec de chaque appel, de 0 (jamais) à 1 (toujours)
   failRate?: () => number
+}
+
+// Reconstitue l'objet et le message de chaque relance passée : les pièces relancées ce jour-là, signées par le collaborateur
+function withMails(data: Dataset): Database {
+  return {
+    ...data,
+    clients: data.clients.map((client) => {
+      const signature = {
+        collaborateur: data.collaborateurs.find((c) => c.id === client.collaborateurId)?.nom ?? NOM_CABINET,
+        cabinet: NOM_CABINET,
+      }
+      return {
+        ...client,
+        relances: client.relances.map((relance) => {
+          const pieces = client.pieces.filter((p) => relance.pieces.includes(p.id))
+          const { objet, message } = composeRelance({ ...client, relances: [] }, new Date(relance.date), signature, pieces)
+          return { ...relance, objet, message }
+        }),
+      }
+    }),
+  }
 }
 
 // Décale toutes les dates du jeu de données pour que la démo reste crédible quel que soit le jour d'ouverture
@@ -80,7 +110,7 @@ export function createApi({
   latency = [400, 800],
   failRate = failRateFromUrl,
 }: ApiOptions = {}) {
-  const db = shiftDataset(data, now())
+  const db = withMails(shiftDataset(data, now()))
   let compteurRelance = 0
 
   // Simule un aller-retour réseau : attente, puis échec éventuel
@@ -151,13 +181,19 @@ export function createApi({
       })
     },
 
-    // POST /api/clients/:id/relances : relance les pièces manquantes (aucun mail réel n'est envoyé)
-    postRelance(id: string) {
+    /*
+      POST /api/clients/:id/relances : relance les pièces manquantes (aucun mail réel n'est envoyé).
+      « mail » : objet et message tels qu'envoyés depuis l'aperçu (retouches comprises).
+      Sans lui, le mail par défaut est enregistré.
+    */
+    postRelance(id: string, mail?: Pick<MailRelance, 'objet' | 'message'>) {
       return network(() => {
         const client = findClient(id)
         const manquantes = piecesManquantes(client)
         if (manquantes.length === 0) throw new ApiError('Aucune pièce à relancer')
 
+        const { objet, message } =
+          mail ?? composeRelance(client, now(), { collaborateur: toView(client).collaborateur, cabinet: NOM_CABINET })
         compteurRelance += 1
         client.relances.push({
           id: `${client.id}-r-new${compteurRelance}`,
@@ -165,6 +201,9 @@ export function createApi({
           par: UTILISATEUR_CONNECTE,
           pieces: manquantes.map((p) => p.id),
           canal: 'mail',
+          mode: 'manuelle',
+          objet,
+          message,
         })
         return toView(client)
       })

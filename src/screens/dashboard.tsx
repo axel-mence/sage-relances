@@ -41,10 +41,13 @@ export function Dashboard() {
                                      → échec : toast d'erreur, rien ne change
     Utilisée par le tableau et par le panneau : renvoie le client à jour, ou rien en cas d'échec.
   */
-  async function handleRelancer(client: ClientView): Promise<ClientView | undefined> {
+  async function handleRelancer(
+    client: ClientView,
+    mail?: { objet: string; message: string },
+  ): Promise<ClientView | undefined> {
     setPendingIds((ids) => new Set(ids).add(client.id))
     try {
-      const updated = await api.postRelance(client.id)
+      const updated = await api.postRelance(client.id, mail)
       clients.update((list) => list.map((c) => (c.id === updated.id ? updated : c)))
       kpis.reload({ silent: true })
       toasts.show(`Relance envoyée à ${client.nom}`)
@@ -72,9 +75,9 @@ export function Dashboard() {
     return new Promise<ClientView | undefined>((resolve) => setDraft({ client, resolve }))
   }
 
-  async function sendDraft() {
+  async function sendDraft(mail: { objet: string; message: string }) {
     if (!draft) return false
-    const updated = await handleRelancer(draft.client)
+    const updated = await handleRelancer(draft.client, mail)
     if (updated) draft.resolve(updated)
     return Boolean(updated)
   }

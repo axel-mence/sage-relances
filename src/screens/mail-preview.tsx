@@ -9,8 +9,8 @@ type MailPreviewProps = {
   now: Date
   // Envoi en cours (bouton en chargement)
   pending: boolean
-  // Envoie la relance : renvoie true si c'est parti (la fenêtre se ferme), false en cas d'échec (elle reste ouverte)
-  onSend: () => Promise<boolean>
+  // Envoie la relance avec le texte retouché : renvoie true si c'est parti (la fenêtre se ferme), false sinon
+  onSend: (mail: { objet: string; message: string }) => Promise<boolean>
   // Appelé une fois la fenêtre fermée (Annuler, ✕, Échap, clic sur le fond ou après l'envoi)
   onClose: () => void
   // Zone de toasts, affichée par-dessus la fenêtre (sinon elle resterait cachée derrière)
@@ -24,7 +24,7 @@ const TITLE_ID = 'mail-preview-title'
   et peut retoucher l'objet et le message.
   Fenêtre <dialog> centrée, au-dessus du tableau ou de la fiche client (même principe que le panneau :
   Échap ferme, focus gardé dedans, puis rendu au bouton « Relancer » d'origine).
-  Simulation : le texte modifié n'est pas envoyé, l'API enregistre seulement la relance.
+  Simulation : aucun mail ne part, mais l'API enregistre le texte envoyé (relu ensuite avec « Voir le mail »).
 */
 export function MailPreview({ client, now, pending, onSend, onClose, toasts }: MailPreviewProps) {
   const [dialog, setDialog] = useState<HTMLDialogElement | null>(null)
@@ -45,7 +45,7 @@ export function MailPreview({ client, now, pending, onSend, onClose, toasts }: M
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    if (await onSend()) close()
+    if (await onSend({ objet, message })) close()
   }
 
   return (
