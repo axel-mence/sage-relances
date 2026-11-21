@@ -24,7 +24,7 @@ export function StatusPills({ counts, onSelect }: StatusPillsProps) {
           <button
             type="button"
             onClick={() => onSelect(group.status)}
-            className="flex h-8 cursor-pointer items-center gap-2 rounded-full border border-border bg-surface px-3 text-label text-secondary transition-colors hover:border-primary hover:text-primary"
+            className="flex h-8 cursor-pointer items-center gap-2 rounded-sm border border-border bg-surface px-3 text-label text-secondary transition-colors hover:border-primary hover:text-primary"
           >
             <span aria-hidden="true" className={`size-2 rounded-full ${DOT[group.status]}`} />
             {group.label}
