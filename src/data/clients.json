@@ -30,6 +30,10 @@
     {
       "id": "cl01",
       "nom": "Boulangerie Les Blés d'Or",
+      "contact": {
+        "nom": "Martine Lefèvre",
+        "email": "martine@lesblesdor.fr"
+      },
       "collaborateurId": "c1",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-18",
@@ -79,6 +83,10 @@
     {
       "id": "cl02",
       "nom": "Garage Peyrot",
+      "contact": {
+        "nom": "Marc Peyrot",
+        "email": "marc@garage-peyrot.fr"
+      },
       "collaborateurId": "c2",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-15",
@@ -111,6 +119,10 @@
     {
       "id": "cl03",
       "nom": "Atelier Couture Nina",
+      "contact": {
+        "nom": "Nina Bouchard",
+        "email": "nina@ateliercouturenina.fr"
+      },
       "collaborateurId": "c3",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-19",
@@ -148,6 +160,10 @@
     {
       "id": "cl04",
       "nom": "SARL Toitures Vasseur",
+      "contact": {
+        "nom": "Pascal Vasseur",
+        "email": "p.vasseur@toitures-vasseur.fr"
+      },
       "collaborateurId": "c4",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-17",
@@ -215,6 +231,10 @@
     {
       "id": "cl05",
       "nom": "Pharmacie du Marché",
+      "contact": {
+        "nom": "Claire Fontaine",
+        "email": "pharmacie@pharmaciedumarche.fr"
+      },
       "collaborateurId": "c5",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-12",
@@ -264,6 +284,10 @@
     {
       "id": "cl06",
       "nom": "Le Comptoir de Lina",
+      "contact": {
+        "nom": "Lina Haddad",
+        "email": "lina@comptoirdelina.fr"
+      },
       "collaborateurId": "c6",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-19",
@@ -297,6 +321,10 @@
     {
       "id": "cl07",
       "nom": "Plomberie Ferrand",
+      "contact": {
+        "nom": "Bruno Ferrand",
+        "email": "contact@plomberie-ferrand.fr"
+      },
       "collaborateurId": "c1",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-24",
@@ -329,6 +357,10 @@
     {
       "id": "cl08",
       "nom": "Studio Pilates Aurore",
+      "contact": {
+        "nom": "Aurore Vidal",
+        "email": "aurore@studiopilates-aurore.fr"
+      },
       "collaborateurId": "c2",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-24",
@@ -366,6 +398,10 @@
     {
       "id": "cl09",
       "nom": "Cabinet Kiné Lambert",
+      "contact": {
+        "nom": "Hugo Lambert",
+        "email": "h.lambert@kine-lambert.fr"
+      },
       "collaborateurId": "c3",
       "regimeTva": "trimestrielle",
       "echeance": "2026-11-30",
@@ -397,6 +433,10 @@
     {
       "id": "cl10",
       "nom": "Épicerie Fine Rossi",
+      "contact": {
+        "nom": "Giulia Rossi",
+        "email": "giulia@epicerie-rossi.fr"
+      },
       "collaborateurId": "c4",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-26",
@@ -436,6 +476,10 @@
     {
       "id": "cl11",
       "nom": "Menuiserie Charpentier",
+      "contact": {
+        "nom": "Didier Charpentier",
+        "email": "didier@menuiserie-charpentier.fr"
+      },
       "collaborateurId": "c5",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-24",
@@ -485,6 +529,10 @@
     {
       "id": "cl12",
       "nom": "Agence Immo Belle Rive",
+      "contact": {
+        "nom": "Sandrine Roux",
+        "email": "sandrine@immo-bellerive.fr"
+      },
       "collaborateurId": "c6",
       "regimeTva": "trimestrielle",
       "echeance": "2026-12-10",
@@ -518,6 +566,10 @@
     {
       "id": "cl13",
       "nom": "Fleurs & Sens",
+      "contact": {
+        "nom": "Émilie Perrin",
+        "email": "emilie@fleursetsens.fr"
+      },
       "collaborateurId": "c1",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-26",
@@ -544,6 +596,10 @@
     {
       "id": "cl14",
       "nom": "Restaurant L'Escale",
+      "contact": {
+        "nom": "Antoine Morel",
+        "email": "direction@restaurant-lescale.fr"
+      },
       "collaborateurId": "c2",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-19",
@@ -603,6 +659,10 @@
     {
       "id": "cl15",
       "nom": "Taxi Moreau",
+      "contact": {
+        "nom": "Yannick Moreau",
+        "email": "taxi.moreau@orange.fr"
+      },
       "collaborateurId": "c3",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-24",
@@ -640,6 +700,10 @@
     {
       "id": "cl16",
       "nom": "Librairie Page 9",
+      "contact": {
+        "nom": "Camille Faure",
+        "email": "camille@librairiepage9.fr"
+      },
       "collaborateurId": "c4",
       "regimeTva": "trimestrielle",
       "echeance": "2026-11-30",
@@ -683,6 +747,10 @@
     {
       "id": "cl17",
       "nom": "Coiffure Élégance",
+      "contact": {
+        "nom": "Nadia Benamar",
+        "email": "nadia@coiffure-elegance.fr"
+      },
       "collaborateurId": "c5",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-24",
@@ -717,6 +785,10 @@
     {
       "id": "cl18",
       "nom": "Électricité Bernard",
+      "contact": {
+        "nom": "Jérôme Bernard",
+        "email": "jerome@electricite-bernard.fr"
+      },
       "collaborateurId": "c6",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-18",
@@ -767,6 +839,10 @@
     {
       "id": "cl19",
       "nom": "Boucherie Delmas",
+      "contact": {
+        "nom": "Patrick Delmas",
+        "email": "boucherie.delmas@gmail.com"
+      },
       "collaborateurId": "c1",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-26",
@@ -801,6 +877,10 @@
     {
       "id": "cl20",
       "nom": "Auto-école Horizon",
+      "contact": {
+        "nom": "Sabrina Collin",
+        "email": "contact@autoecole-horizon.fr"
+      },
       "collaborateurId": "c2",
       "regimeTva": "trimestrielle",
       "echeance": "2026-11-30",
@@ -829,6 +909,10 @@
     {
       "id": "cl21",
       "nom": "Ostéo Santé Martin",
+      "contact": {
+        "nom": "Mathieu Martin",
+        "email": "m.martin@osteosante.fr"
+      },
       "collaborateurId": "c3",
       "regimeTva": "trimestrielle",
       "echeance": "2026-12-10",
@@ -857,6 +941,10 @@
     {
       "id": "cl22",
       "nom": "Brasserie du Port",
+      "contact": {
+        "nom": "Olivier Guérin",
+        "email": "olivier@brasserieduport.fr"
+      },
       "collaborateurId": "c4",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-24",
@@ -913,6 +1001,10 @@
     {
       "id": "cl23",
       "nom": "Paysages Dubreuil",
+      "contact": {
+        "nom": "Fabien Dubreuil",
+        "email": "fabien@paysages-dubreuil.fr"
+      },
       "collaborateurId": "c5",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-26",
@@ -947,6 +1039,10 @@
     {
       "id": "cl24",
       "nom": "Opticien Vue Claire",
+      "contact": {
+        "nom": "Léa Gauthier",
+        "email": "lea@opticien-vueclaire.fr"
+      },
       "collaborateurId": "c6",
       "regimeTva": "mensuelle",
       "echeance": "2026-11-19",

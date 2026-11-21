@@ -9,6 +9,7 @@ function makeClient(overrides: Partial<Client> = {}): Client {
   return {
     id: 'x',
     nom: 'Client test',
+    contact: { nom: 'Contact test', email: 'contact@test.fr' },
     collaborateurId: 'c1',
     regimeTva: 'mensuelle',
     echeance: '2026-11-25',

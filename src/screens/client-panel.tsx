@@ -90,6 +90,26 @@ function PanelContent({ client, now, pending, onRelancer, onClose }: PanelConten
           <p className="text-caption text-muted">
             {client.collaborateur} · TVA {client.regimeTva}
           </p>
+          {/* Contact du client : destinataire des relances, e-mail cliquable pour écrire directement */}
+          <p className="mt-2 flex min-w-0 items-center gap-2 text-body text-secondary">
+            <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 shrink-0">
+              <path
+                d="M2 4.5A1.5 1.5 0 0 1 3.5 3h9A1.5 1.5 0 0 1 14 4.5v7a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5ZM2.5 4.5 8 8.5l5.5-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="shrink-0 text-primary">{client.contact.nom}</span>
+            <a
+              href={`mailto:${client.contact.email}`}
+              className="truncate underline decoration-border underline-offset-4 hover:text-primary hover:decoration-current"
+            >
+              {client.contact.email}
+            </a>
+          </p>
         </div>
         <CloseButton onClose={onClose} />
       </header>
