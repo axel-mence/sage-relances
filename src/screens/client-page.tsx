@@ -1,15 +1,18 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../api/clients-api'
 import { Button } from '../components/button'
 import { ContactBloc, DerniereRelanceBloc, EntrepriseBloc, PiecesBloc } from '../components/client-details'
 import { StatusBadge } from '../components/status-badge'
+import { TabPanel, Tabs } from '../components/tabs'
+import { Timeline } from '../components/timeline'
 import { WriteEmailLink } from '../components/write-email-link'
+import { activiteClient } from '../domain/activity'
 import { formatEcheanceRelative, formatJourMois } from '../domain/format'
 import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useNow } from '../hooks/use-now'
 import { useRelance } from '../hooks/use-relance'
-import { backToList } from '../hooks/use-route'
+import { backFromClient, backLabel } from '../hooks/use-route'
 
 type ClientPageProps = {
   slug: string
@@ -26,14 +29,14 @@ export function ClientPage({ slug }: ClientPageProps) {
   return (
     <main className="flex min-w-0 flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:py-8 xl:px-8">
       <a
-        href="/"
+        href="/clients"
         onClick={(event) => {
           event.preventDefault()
-          backToList()
+          backFromClient()
         }}
         className="self-start text-label text-secondary hover:text-primary"
       >
-        ‹ Clients
+        ‹ {backLabel()}
       </a>
 
       {client.loading && !client.data ? (
@@ -49,7 +52,8 @@ export function ClientPage({ slug }: ClientPageProps) {
         />
       )}
 
-      {relance.elements}
+      {relance.preview}
+      {relance.toasts}
     </main>
   )
 }
@@ -103,7 +107,14 @@ function ClientContent({ client, now, pending, onRelancer }: ClientContentProps)
         Les détails viennent en premier dans la page : sur mobile, ils passent avant l'historique.
       */}
       <div className="grid items-start gap-6 lg:grid-cols-3 xl:gap-8">
-        <aside aria-label="Détails du client" className="flex flex-col gap-4">
+        {/*
+          Grand écran : colonne de droite collée (sticky), seul l'historique défile avec la page.
+          Si elle est plus haute que l'écran, elle défile dans son propre cadre pour rester entièrement lisible.
+        */}
+        <aside
+          aria-label="Détails du client"
+          className="flex flex-col gap-4 lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto lg:overscroll-contain"
+        >
           <DerniereRelanceBloc client={client} now={now} />
           <PiecesBloc client={client} now={now} />
           <ContactBloc client={client} />
@@ -111,12 +122,56 @@ function ClientContent({ client, now, pending, onRelancer }: ClientContentProps)
         </aside>
 
         <section aria-label="Historique" className="lg:order-first lg:col-span-2">
-          {/* TEMPORAIRE (étape 3) : onglets Activité et Mails envoyés à l'étape 4 */}
-          <p className="rounded-md border border-dashed border-border p-6 text-caption text-muted">
-            Historique (onglets Activité et Mails envoyés) : étape 4.
-          </p>
+          <Historique client={client} now={now} onRelancer={onRelancer} />
         </section>
       </div>
     </>
+  )
+}
+
+type Onglet = 'activite' | 'mails'
+
+type HistoriqueProps = {
+  client: ClientView
+  now: Date
+  onRelancer: (client: ClientView) => void
+}
+
+/*
+  Colonne de gauche : 2 onglets (référence Attio, note « top »).
+  - Activité : tout ce qui s'est passé sur le dossier, groupé par jour (Shopify)
+  - Mails envoyés : uniquement les relances, avec « Voir le mail »
+*/
+function Historique({ client, now, onRelancer }: HistoriqueProps) {
+  const [onglet, setOnglet] = useState<Onglet>('activite')
+  const activite = activiteClient(client)
+  const mails = activite.filter((evenement) => evenement.type === 'relance')
+  const evenements = onglet === 'activite' ? activite : mails
+
+  return (
+    <div className="flex flex-col gap-6">
+      <Tabs
+        idPrefix="historique"
+        label="Historique du client"
+        items={[
+          { value: 'activite', label: 'Activité' },
+          { value: 'mails', label: 'Mails envoyés', count: mails.length },
+        ]}
+        value={onglet}
+        onChange={setOnglet}
+      />
+      <TabPanel idPrefix="historique" value={onglet}>
+        {evenements.length > 0 ? (
+          <Timeline client={client} evenements={evenements} now={now} />
+        ) : onglet === 'mails' ? (
+          <div className="flex flex-col items-center gap-4 rounded-md border border-dashed border-border px-6 py-10 text-center">
+            <p className="text-secondary">Aucun mail envoyé à ce client.</p>
+            {client.nbManquantes > 0 && <Button onClick={() => onRelancer(client)}>Relancer</Button>}
+          </div>
+        ) : (
+          <p className="text-secondary">Rien pour l'instant. Les relances et les pièces reçues apparaîtront ici.</p>
+        )}
+      </TabPanel>
+    </div>
   )
 }
