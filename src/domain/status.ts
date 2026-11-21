@@ -17,6 +17,13 @@ export function piecesManquantes(client: Client) {
   return client.pieces.filter((piece) => piece.statut === 'manquante')
 }
 
+// Complétude d'un dossier : part des pièces attendues déjà reçues, en % arrondi (0 à 100)
+export function tauxCompletude(client: Client): number {
+  if (client.pieces.length === 0) return 100
+  const recues = client.pieces.filter((piece) => piece.statut === 'recue').length
+  return Math.round((recues / client.pieces.length) * 100)
+}
+
 export function derniereRelance(client: Client): Relance | undefined {
   return [...client.relances].sort((a, b) => b.date.localeCompare(a.date))[0]
 }

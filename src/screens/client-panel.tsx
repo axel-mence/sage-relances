@@ -3,6 +3,8 @@ import { api } from '../api/clients-api'
 import { Button } from '../components/button'
 import { SidePanel } from '../components/side-panel'
 import { StatusBadge } from '../components/status-badge'
+import { Completude } from '../components/completude'
+import { tauxCompletude } from '../domain/status'
 import { formatDateHeure, formatEcheance, formatEcheanceRelative, formatJourMois, formatPeriode } from '../domain/format'
 import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
@@ -99,6 +101,16 @@ function PanelContent({ client, now, pending, onRelancer, onClose }: PanelConten
           <span className={`text-label ${echeanceEnRouge ? 'text-status-retard' : 'text-secondary'}`}>
             Échéance le {formatJourMois(new Date(`${client.echeance}T00:00:00`))} · {formatEcheanceRelative(client.echeance, now)}
           </span>
+        </div>
+
+        {/* Complétude du dossier : pièces reçues sur pièces attendues */}
+        <div className="flex flex-col gap-2">
+          <span className="text-caption text-secondary tabular-nums">
+            Complétude · {client.pieces.length - client.nbManquantes} pièce
+            {client.pieces.length - client.nbManquantes > 1 ? 's' : ''} reçue
+            {client.pieces.length - client.nbManquantes > 1 ? 's' : ''} sur {client.pieces.length}
+          </span>
+          <Completude value={tauxCompletude(client)} size="lg" />
         </div>
 
         <section aria-labelledby="pieces-title" className="flex flex-col gap-3">

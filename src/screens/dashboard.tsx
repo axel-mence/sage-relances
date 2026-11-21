@@ -1,17 +1,18 @@
 import { useMemo, useState } from 'react'
 import { api } from '../api/clients-api'
 import { ClientTable } from '../components/client-table'
-import { DistributionBar } from '../components/distribution-bar'
-import { ListEmpty, ListError, ListSkeleton } from '../components/list-states'
+import { ListEmpty, ListError, ListNoResult, ListSkeleton } from '../components/list-states'
+import { SearchField } from '../components/search-field'
 import { MobileTopBar, Sidebar } from '../components/sidebar'
-import { StatusTabs } from '../components/status-tabs'
+import { StatusPills } from '../components/status-pills'
 import { TimeSaved } from '../components/time-saved'
 import { Toasts } from '../components/toasts'
-import { TABS, type StatusFilter } from '../domain/filters'
+import { GROUPS, groupId } from '../domain/filters'
 import { formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
-import type { ClientView } from '../domain/types'
+import type { ClientView, DossierStatus } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useNow } from '../hooks/use-now'
+import { useOpenGroups } from '../hooks/use-open-groups'
 import { ClientPanel } from './client-panel'
 import { useToasts } from '../hooks/use-toasts'
 
@@ -19,9 +20,10 @@ import { useToasts } from '../hooks/use-toasts'
 export function Dashboard() {
   const now = useNow()
   const kpis = useAsync(api.getKpis)
-  // On charge tous les clients une fois et on filtre ici : les compteurs des onglets restent justes
+  // On charge tous les clients une fois et on les range par groupe ici : les compteurs restent justes
   const clients = useAsync(api.getClients)
-  const [filter, setFilter] = useState<StatusFilter>('en_retard')
+  const groups = useOpenGroups()
+  const [query, setQuery] = useState('')
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
   // Client affiché dans le panneau latéral (aucun si fermé)
   const [selectedId, setSelectedId] = useState<string>()
@@ -53,15 +55,32 @@ export function Dashboard() {
     }
   }
 
+  // Nombre de clients par statut : alimente la barre de répartition et les en-têtes de groupe
   const counts = useMemo(() => {
     const list = clients.data ?? []
-    return Object.fromEntries(
-      TABS.map((tab) => [tab.value, tab.value === 'tous' ? list.length : list.filter((c) => c.statut === tab.value).length]),
-    ) as Record<StatusFilter, number>
+    return Object.fromEntries(GROUPS.map((g) => [g.status, list.filter((c) => c.statut === g.status).length])) as Record<
+      DossierStatus,
+      number
+    >
   }, [clients.data])
 
-  const visibleClients = (clients.data ?? []).filter((c) => filter === 'tous' || c.statut === filter)
+  // Recherche sans tenir compte des majuscules ni des accents (« ines » trouve « Inès »)
+  const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  const search = normalize(query.trim())
+  const visibleClients = (clients.data ?? []).filter(
+    (c) => !search || normalize(c.nom).includes(search) || normalize(c.collaborateur).includes(search),
+  )
 
+  // Pastille d'état : ouvre le groupe puis fait défiler jusqu'à lui
+  function goToGroup(status: DossierStatus) {
+    groups.openGroup(status)
+    // Après l'affichage du groupe ouvert ; l'id mobile est utilisé quand le tableau desktop est masqué
+    setTimeout(() => {
+      const desktop = document.getElementById(groupId(status))
+      const target = desktop?.offsetParent ? desktop : document.getElementById(`${groupId(status)}-mobile`)
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 0)
+  }
 
   // « Réessayer » recharge la liste, et les KPI s'ils étaient aussi en erreur
   function handleRetry() {
@@ -93,27 +112,30 @@ export function Dashboard() {
           />
         </header>
 
-        {/* Barre de répartition (N2) : un clic sur un segment filtre la liste sur ce statut */}
-        {clients.data ? (
-          <DistributionBar counts={counts} active={filter} onSelect={setFilter} />
-        ) : (
-          clients.loading && <span aria-hidden="true" className="h-2 animate-pulse rounded-full bg-border" />
-        )}
+        {/* Recherche + pastilles d'état (raccourcis vers les groupes) */}
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <SearchField value={query} onChange={setQuery} />
+          {clients.data && <StatusPills counts={counts} onSelect={goToGroup} />}
+        </div>
 
-        <section aria-label="Clients" className="flex flex-col gap-4">
-          <StatusTabs value={filter} counts={clients.data ? counts : undefined} onChange={setFilter} panelId="clients-panel" />
-          <div id="clients-panel" role="tabpanel" aria-labelledby={`tab-${filter}`}>
-            {/* États de la liste : chargement, erreur, vide, puis contenu (spec, section 8) */}
+        <section aria-label="Clients par statut" className="flex flex-col gap-4">
+          {/* États de la liste : chargement, erreur, vide, puis groupes (spec, section 8) */}
+          <div>
             {clients.loading ? (
               <ListSkeleton />
             ) : clients.error ? (
               <ListError onRetry={handleRetry} />
+            ) : clients.data?.length === 0 ? (
+              <ListEmpty />
             ) : visibleClients.length === 0 ? (
-              <ListEmpty onShowAll={filter === 'tous' ? undefined : () => setFilter('tous')} />
+              <ListNoResult query={query.trim()} onClear={() => setQuery('')} />
             ) : (
               <ClientTable
                 clients={visibleClients}
+                searching={!!search}
                 now={now}
+                openGroups={groups.open}
+                onToggleGroup={groups.toggle}
                 onRelancer={handleRelancer}
                 onOpen={(client) => setSelectedId(client.id)}
                 pendingIds={pendingIds}

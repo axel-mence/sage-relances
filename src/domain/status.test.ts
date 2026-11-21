@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeStatus } from './status'
+import { computeStatus, tauxCompletude } from './status'
 import type { Client } from './types'
 
 const NOW = new Date('2026-11-20T12:00:00')
@@ -58,5 +58,24 @@ describe('computeStatus', () => {
   it('ignore une relance de plus de 3 jours', () => {
     const client = makeClient({ echeance: '2026-11-15', relances: [relanceIlYa(73)] })
     expect(computeStatus(client, NOW)).toBe('en_retard')
+  })
+})
+
+describe('tauxCompletude', () => {
+  it('calcule la part de pièces reçues, arrondie', () => {
+    expect(tauxCompletude(makeClient())).toBe(50) // 1 reçue sur 2
+    const troisPieces = makeClient({
+      pieces: [
+        { id: 'a', libelle: 'A', statut: 'recue' },
+        { id: 'b', libelle: 'B', statut: 'manquante' },
+        { id: 'c', libelle: 'C', statut: 'manquante' },
+      ],
+    })
+    expect(tauxCompletude(troisPieces)).toBe(33)
+  })
+
+  it('vaut 100 % quand tout est reçu ou qu’aucune pièce n’est attendue', () => {
+    expect(tauxCompletude(makeClient({ pieces: [{ id: 'a', libelle: 'A', statut: 'recue' }] }))).toBe(100)
+    expect(tauxCompletude(makeClient({ pieces: [] }))).toBe(100)
   })
 })

@@ -42,27 +42,27 @@ export function ListError({ onRetry }: { onRetry: () => void }) {
   )
 }
 
-type ListEmptyProps = {
-  // Absent sur l'onglet « Tous » : il n'y a pas d'autre onglet vers lequel renvoyer
-  onShowAll?: () => void
-}
-
-// Vide : aucun client dans l'onglet, avec un lien vers « Tous »
-export function ListEmpty({ onShowAll }: ListEmptyProps) {
+// Vide : aucun dossier pour la période (un groupe vide l'indique dans la liste elle-même)
+export function ListEmpty() {
   return (
     <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border bg-surface px-4 py-12 text-center">
-      <span className="text-label text-primary">
-        {onShowAll ? 'Aucun client dans cet onglet' : 'Aucun dossier pour cette période'}
-      </span>
-      {onShowAll && (
-        <button
-          type="button"
-          onClick={onShowAll}
-          className="cursor-pointer rounded-sm text-label text-accent-strong underline-offset-2 hover:underline"
-        >
-          Voir tous les clients
-        </button>
-      )}
+      <span className="text-label text-primary">Aucun dossier pour cette période</span>
+    </div>
+  )
+}
+
+// Recherche sans résultat : rappelle le texte cherché et propose d'effacer
+export function ListNoResult({ query, onClear }: { query: string; onClear: () => void }) {
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border bg-surface px-4 py-12 text-center">
+      <span className="text-label text-primary">Aucun client ne correspond à « {query} »</span>
+      <button
+        type="button"
+        onClick={onClear}
+        className="cursor-pointer rounded-sm text-label text-accent-strong underline-offset-2 hover:underline"
+      >
+        Effacer la recherche
+      </button>
     </div>
   )
 }
