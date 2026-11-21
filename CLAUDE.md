@@ -50,5 +50,8 @@ src/
 ## Git
 
 - Branche de travail : `feature/relance-pieces`.
-- Commits conventionnels en français, à l'impératif : `feat(scope): description`, `fix(scope): ...`, `chore: ...`, `test(scope): ...`.
+- Commits conventionnels en français : `type(zone): description` (`feat`, `fix`, `chore`, `test`, `docs`, `style`, `refactor`).
+- Titre de 50 caractères maximum, un verbe (« ajoute », « corrige », « simule »), aucun détail technique : les détails vont dans le corps du message.
+  - Oui : `feat(relance): ajoute la relance depuis une ligne`
+  - Non : `feat(relance): permet de relancer un client depuis sa ligne avec toast et KPI`
 - Un commit par étape de construction au minimum (spec, section 12). Pas de commit ni de push sans validation d'Axel.
