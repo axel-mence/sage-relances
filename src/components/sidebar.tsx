@@ -56,7 +56,7 @@ function NavList({ items }: { items: NavItem[] }) {
 
 /*
   Barre latérale sur grand écran (lg et plus), sur le fond dégradé Nudge du thème actif (clair ou sombre).
-  Structure reprise de n8n : navigation principale, section « Cabinet », entrées secondaires en bas,
+  Structure reprise de n8n : navigation principale, section « Cabinet », thème et entrées secondaires en bas,
   puis le bloc utilisateur. Collée en haut (sticky) et haute d'un écran exactement :
   elle ne défile jamais avec la page, et le bloc utilisateur reste toujours visible en bas.
 */
@@ -81,13 +81,16 @@ export function Sidebar() {
           </span>
         </div>
 
-        <div className="mt-auto px-3 py-4">
+        {/* Pastille clair / sombre juste au-dessus des entrées secondaires */}
+        <div className="mt-auto flex flex-col gap-4 px-3 py-4">
+          <div className="px-3">
+            <ThemeToggle />
+          </div>
           <NavList items={FOOTER_ITEMS} />
         </div>
       </nav>
 
-      <div className="flex flex-col gap-4 border-t border-border px-6 py-4">
-        <ThemeToggle />
+      <div className="border-t border-border px-6 py-4">
         <div className="flex items-center gap-3">
           <Avatar />
           <div className="flex min-w-0 flex-col">
