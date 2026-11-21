@@ -1,20 +1,21 @@
-import { useCallback, type ReactNode } from 'react'
-import { api } from '../api/clients-api'
+import type { ReactNode } from 'react'
 import { Button } from '../components/button'
+import { Completude } from '../components/completude'
 import { SidePanel } from '../components/side-panel'
 import { StatusBadge } from '../components/status-badge'
-import { Completude } from '../components/completude'
-import { tauxCompletude } from '../domain/status'
+import { WriteEmailLink } from '../components/write-email-link'
 import { formatDateHeure, formatEcheance, formatEcheanceRelative, formatJourMois, formatPeriode } from '../domain/format'
+import { tauxCompletude } from '../domain/status'
 import type { ClientView } from '../domain/types'
-import { useAsync } from '../hooks/use-async'
 
 type ClientPanelProps = {
-  clientId: string
+  // Client de la liste : le panneau se met à jour tout seul après une relance
+  client: ClientView
   now: Date
   pending: boolean
-  // Relance partagée avec le tableau : renvoie le client à jour, ou rien si l'envoi a échoué
-  onRelancer: (client: ClientView) => Promise<ClientView | undefined>
+  onRelancer: (client: ClientView) => void
+  // « Détail » : ouvre la page client complète (/clients/:slug)
+  onDetail: (client: ClientView) => void
   onClose: () => void
   /*
     Zone des toasts. Un panneau ouvert passe devant tout le reste de la page, toasts compris :
@@ -25,28 +26,27 @@ type ClientPanelProps = {
 
 const TITLE_ID = 'client-panel-title'
 
-// Écran 03 · Fiche client en panneau latéral (spec, section 7)
-export function ClientPanel({ clientId, now, pending, onRelancer, onClose, toasts }: ClientPanelProps) {
-  // La requête ne change que si on ouvre un autre client
-  const request = useCallback(() => api.getClient(clientId), [clientId])
-  const client = useAsync(request)
-
-  async function handleRelancer(current: ClientView) {
-    const updated = await onRelancer(current)
-    if (updated) client.update(() => updated)
-  }
-
+/*
+  Écran 03 · Aperçu rapide d'un client en panneau latéral, depuis le tableau de bord (spec, section 7).
+  Pour tout l'historique, « Détail » mène à la page client (spec-clients-relances, partie 1).
+*/
+export function ClientPanel({ client, now, pending, onRelancer, onDetail, onClose, toasts }: ClientPanelProps) {
   return (
     <SidePanel labelledBy={TITLE_ID} onClose={onClose}>
       {(close) => (
         <>
-          {client.loading && !client.data ? (
-            <PanelSkeleton onClose={close} />
-          ) : client.error || !client.data ? (
-            <PanelError onClose={close} onRetry={() => client.reload()} />
-          ) : (
-            <PanelContent client={client.data} now={now} pending={pending} onRelancer={handleRelancer} onClose={close} />
-          )}
+          <PanelContent
+            client={client}
+            now={now}
+            pending={pending}
+            onRelancer={onRelancer}
+            onDetail={() => {
+              // Le panneau se ferme d'abord (le focus est rendu), puis on change de page
+              close()
+              onDetail(client)
+            }}
+            onClose={close}
+          />
           {toasts}
         </>
       )}
@@ -72,10 +72,11 @@ type PanelContentProps = {
   now: Date
   pending: boolean
   onRelancer: (client: ClientView) => void
+  onDetail: () => void
   onClose: () => void
 }
 
-function PanelContent({ client, now, pending, onRelancer, onClose }: PanelContentProps) {
+function PanelContent({ client, now, pending, onRelancer, onDetail, onClose }: PanelContentProps) {
   // Historique du plus récent au plus ancien
   const relances = [...client.relances].sort((a, b) => b.date.localeCompare(a.date))
   const libelles = Object.fromEntries(client.pieces.map((p) => [p.id, p.libelle]))
@@ -95,29 +96,13 @@ function PanelContent({ client, now, pending, onRelancer, onClose }: PanelConten
             <span className="shrink-0 text-primary">{client.contact.nom}</span>
             <span className="truncate select-all">{client.contact.email}</span>
           </p>
-          {/*
-            « Lui écrire » : ouvre un nouveau mail dans Outlook (version web, Microsoft 365), destinataire déjà rempli.
-            Nouvel onglet pour ne pas quitter l'outil. Pour un mail libre, hors relance (une question, un rendez-vous…).
-          */}
-          <a
-            href={`https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(client.contact.email)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Écrire à ${client.contact.nom} dans Outlook (nouvel onglet)`}
-            className="mt-3 inline-flex h-8 items-center gap-2 self-start rounded-sm border border-border px-3 text-label text-primary transition-colors hover:bg-surface-2"
-          >
-            <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 shrink-0">
-              <path
-                d="M2 4.5A1.5 1.5 0 0 1 3.5 3h9A1.5 1.5 0 0 1 14 4.5v7a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5ZM2.5 4.5 8 8.5l5.5-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-            Lui écrire
-          </a>
+          {/* « Lui écrire » (Outlook) et « Détail » (page client complète, avec tout l'historique) */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <WriteEmailLink contact={client.contact} />
+            <Button variant="secondary" onClick={onDetail}>
+              Détail
+            </Button>
+          </div>
         </div>
         <CloseButton onClose={onClose} />
       </header>
@@ -224,35 +209,5 @@ function PanelContent({ client, now, pending, onRelancer, onClose }: PanelConten
         <span id="assigner-bientot" className="sr-only">Bientôt disponible</span>
       </footer>
     </>
-  )
-}
-
-function PanelSkeleton({ onClose }: { onClose: () => void }) {
-  return (
-    <div aria-busy="true" className="flex flex-col gap-6 p-6">
-      <div className="flex items-start justify-between">
-        <h2 id={TITLE_ID} className="sr-only">Chargement de la fiche client</h2>
-        <span className="h-7 w-48 animate-pulse rounded-sm bg-surface-2" />
-        <CloseButton onClose={onClose} />
-      </div>
-      <span className="h-7 w-32 animate-pulse rounded-xs bg-surface-2" />
-      <span className="h-40 animate-pulse rounded-md bg-surface-2" />
-      <span className="h-24 animate-pulse rounded-md bg-surface-2" />
-    </div>
-  )
-}
-
-function PanelError({ onClose, onRetry }: { onClose: () => void; onRetry: () => void }) {
-  return (
-    <div className="flex flex-col gap-4 p-6">
-      <div className="flex items-start justify-between gap-4">
-        <h2 id={TITLE_ID} className="font-display text-section">Fiche indisponible</h2>
-        <CloseButton onClose={onClose} />
-      </div>
-      <p className="text-secondary">Impossible de récupérer ce dossier pour le moment.</p>
-      <Button variant="secondary" onClick={onRetry} className="self-start">
-        Réessayer
-      </Button>
-    </div>
   )
 }

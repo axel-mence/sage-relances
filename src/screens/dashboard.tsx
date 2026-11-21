@@ -13,6 +13,7 @@ import { useAsync } from '../hooks/use-async'
 import { useElementHeight } from '../hooks/use-element-height'
 import { useNow } from '../hooks/use-now'
 import { useRelance } from '../hooks/use-relance'
+import { ClientPanel } from './client-panel'
 import { navigate } from '../hooks/use-route'
 
 type DashboardProps = {
@@ -20,7 +21,7 @@ type DashboardProps = {
   active: boolean
 }
 
-// Écran 01 · Liste des clients (spec, section 7)
+// Écran 01 · Tableau de bord des pièces manquantes (spec, section 7)
 export function Dashboard({ active }: DashboardProps) {
   const now = useNow()
   const kpis = useAsync(api.getKpis)
@@ -87,12 +88,18 @@ export function Dashboard({ active }: DashboardProps) {
     )
 
 
+  // Client ouvert dans le panneau latéral (lu dans la liste : il suit les relances)
+  const [selectedId, setSelectedId] = useState<string>()
+  const selected = clients.data?.find((c) => c.id === selectedId)
+
   /*
-    Ouvre la fiche client (page dédiée), en lui transmettant l'ordre de la liste affichée :
-    il servira aux flèches précédent / suivant (« 2 sur 6 · En retard »).
+    « Détail » du panneau : ouvre la page client, en lui transmettant d'où l'on vient (retour)
+    et l'ordre de la liste affichée (flèches précédent / suivant, « 2 sur 6 · En retard »).
   */
-  function openClient(client: ClientView) {
+  function openClientPage(client: ClientView) {
+    setSelectedId(undefined)
     navigate(`/clients/${client.slug}`, {
+      depuis: { path: '/', libelle: 'Tableau de bord' },
       liste: {
         slugs: visibleClients.map((c) => c.slug),
         libelle: FILTERS.find((f) => f.value === filter)?.label ?? 'Tous',
@@ -164,7 +171,7 @@ export function Dashboard({ active }: DashboardProps) {
                 clients={visibleClients}
                 now={now}
                 onRelancer={relance.requestRelance}
-                onOpen={openClient}
+                onOpen={(client) => setSelectedId(client.id)}
                 pendingIds={relance.pendingIds}
               />
             )}
@@ -172,7 +179,21 @@ export function Dashboard({ active }: DashboardProps) {
         </section>
       </main>
 
-      {relance.elements}
+      {selected && (
+        <ClientPanel
+          client={selected}
+          now={now}
+          pending={relance.pendingIds.has(selected.id)}
+          onRelancer={relance.requestRelance}
+          onDetail={(client) => openClientPage(client)}
+          onClose={() => setSelectedId(undefined)}
+          toasts={relance.toasts}
+        />
+      )}
+
+      {relance.preview}
+      {/* Toasts dans la page, sauf si le panneau est ouvert (il les affiche lui-même) */}
+      {!selected && relance.toasts}
     </>
   )
 }

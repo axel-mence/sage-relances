@@ -17,8 +17,13 @@ type UseRelance = {
   requestRelance: (client: ClientView) => void
   // Ids des clients dont la relance est en cours d'envoi (boutons en chargement)
   pendingIds: Set<string>
-  // Fenêtre d'aperçu et toasts, à placer dans la page
-  elements: ReactNode
+  // Fenêtre d'aperçu (null si fermée), à placer dans la page
+  preview: ReactNode
+  /*
+    Toasts à placer dans la page, ou dans le panneau latéral s'il est ouvert (sinon cachés derrière lui).
+    null pendant que l'aperçu est ouvert : il les affiche lui-même, par-dessus sa fenêtre.
+  */
+  toasts: ReactNode
 }
 
 /*
@@ -58,7 +63,8 @@ export function useRelance({ now, onSent }: UseRelanceOptions): UseRelance {
   return {
     requestRelance: setDraft,
     pendingIds,
-    elements: draft ? (
+    toasts: draft ? null : toastZone,
+    preview: draft && (
       <MailPreview
         // Une nouvelle fenêtre (et un nouveau brouillon) par client
         key={draft.id}
@@ -70,8 +76,6 @@ export function useRelance({ now, onSent }: UseRelanceOptions): UseRelance {
         // Les toasts s'affichent par-dessus la fenêtre tant qu'elle est ouverte
         toasts={toastZone}
       />
-    ) : (
-      toastZone
     ),
   }
 }
