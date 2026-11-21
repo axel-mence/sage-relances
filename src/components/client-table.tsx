@@ -37,7 +37,7 @@ function libellesManquants(client: ClientView) {
 function Echeance({ client, now }: { client: ClientView; now: Date }) {
   const depassee = client.statut !== 'complet' && client.echeance < toDateKey(now)
   return (
-    <span className={depassee ? 'text-status-retard' : undefined}>
+    <span className={depassee ? 'text-status-retard' : 'text-secondary'}>
       {formatEcheance(client.echeance)}
       {depassee && <span className="sr-only"> (dépassée)</span>}
     </span>
@@ -49,12 +49,12 @@ function PiecesManquantes({ client }: { client: ClientView }) {
   return (
     // Le survol de la cellule affiche toujours la liste complète des pièces
     <span title={libellesManquants(client).join(', ')} className="flex min-w-0 items-baseline gap-2">
-      <span className="text-label">{client.nbManquantes}</span>
+      <span className="text-primary tabular-nums">{client.nbManquantes}</span>
       {/*
         Résumé masqué entre 1024 et 1280 px (le nombre suffit, place prise par la complétude).
         Largeur bornée ici (et pas sur la cellule, que le tableau ignore) pour couper avec « … ».
       */}
-      <span className="truncate text-caption text-secondary lg:hidden xl:inline-block xl:max-w-40 2xl:max-w-56">
+      <span className="truncate text-secondary lg:hidden xl:inline-block xl:max-w-36 2xl:max-w-56">
         {resumePieces(libellesManquants(client))}
       </span>
     </span>
@@ -98,7 +98,14 @@ function Actions({ client, pending, onRelancer, onOpen }: ActionsProps) {
   )
 }
 
-const CELL = 'px-2.5 py-3 xl:px-3'
+/*
+  Densité de la liste (DS v2, étape 4 du MD) :
+  lignes de 44 px (bouton de 32 px + 2 × 6 px), marges horizontales de 16 px à partir de 1280 px
+  (10 px entre 1024 et 1280 px pour que le tableau tienne), séparateurs de 1 px.
+*/
+const CELL = 'h-11 px-2.5 py-1.5 xl:px-4'
+// Dates et nombres alignés à droite (chiffres tabulaires hérités du tableau)
+const NUM = `${CELL} text-right`
 
 export function ClientTable({ clients, now, searching, openGroups, onToggleGroup, onRelancer, onOpen, pendingIds }: ClientTableProps) {
   // Clients rangés par groupe, dans l'ordre des groupes (le tri de l'API est conservé dans chaque groupe)
@@ -116,11 +123,11 @@ export function ClientTable({ clients, now, searching, openGroups, onToggleGroup
           <thead className="border-b border-border text-caption text-secondary lg:whitespace-normal xl:whitespace-nowrap">
             <tr>
               <th scope="col" className={`${CELL} font-medium`}>Client</th>
-              <th scope="col" className={`${CELL} font-medium`}>Complétude</th>
+              <th scope="col" className={`${NUM} font-medium`}>Complétude</th>
               <th scope="col" className={`${CELL} hidden font-medium 2xl:table-cell`}>Collaborateur</th>
               <th scope="col" className={`${CELL} font-medium`}>Pièces manquantes</th>
-              <th scope="col" className={`${CELL} font-medium`}>Échéance</th>
-              <th scope="col" className={`${CELL} font-medium`}>Dernière relance</th>
+              <th scope="col" className={`${NUM} font-medium`}>Échéance</th>
+              <th scope="col" className={`${NUM} font-medium`}>Dernière relance</th>
               <th scope="col" className={`${CELL} font-medium`}>
                 <span className="sr-only">Actions</span>
               </th>
@@ -147,7 +154,7 @@ export function ClientTable({ clients, now, searching, openGroups, onToggleGroup
 
                 {open && group.clients.length === 0 && (
                   <tr className="border-b border-border">
-                    <td colSpan={7} className="px-4 py-3 text-secondary">Aucun client dans ce groupe</td>
+                    <td colSpan={7} className="h-11 px-4 text-secondary">Aucun client dans ce groupe</td>
                   </tr>
                 )}
 
@@ -159,15 +166,16 @@ export function ClientTable({ clients, now, searching, openGroups, onToggleGroup
                       className="cursor-pointer border-b border-border hover:bg-page"
                     >
                       <th scope="row" className={`${CELL} text-left font-normal`}>
-                        <span className="block text-label text-primary">{client.nom}</span>
+                        {/* Hiérarchie : nom en 14 Medium noir, le reste en 14 Regular gris */}
+                        <span className="block font-medium text-primary">{client.nom}</span>
                         {/* Collaborateur sous le nom quand la colonne dédiée est masquée */}
                         <span className="block text-caption text-secondary 2xl:hidden">{client.collaborateur}</span>
                       </th>
-                      <td className={CELL}><Completude value={tauxCompletude(client)} /></td>
+                      <td className={NUM}><Completude value={tauxCompletude(client)} /></td>
                       <td className={`${CELL} hidden text-secondary 2xl:table-cell`}>{client.collaborateur}</td>
                       <td className={CELL}><PiecesManquantes client={client} /></td>
-                      <td className={CELL}><Echeance client={client} now={now} /></td>
-                      <td className={`${CELL} text-secondary`}>{formatRelatif(client.derniereRelance, now)}</td>
+                      <td className={NUM}><Echeance client={client} now={now} /></td>
+                      <td className={`${NUM} text-secondary`}>{formatRelatif(client.derniereRelance, now)}</td>
                       <td className={CELL}>
                         <Actions client={client} pending={pendingIds.has(client.id)} onRelancer={onRelancer} onOpen={onOpen} />
                       </td>
@@ -200,7 +208,7 @@ export function ClientTable({ clients, now, searching, openGroups, onToggleGroup
                     <li key={client.id} onClick={() => onOpen(client)} className="flex cursor-pointer flex-col gap-3 p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex flex-col">
-                          <span className="text-label text-primary">{client.nom}</span>
+                          <span className="font-medium text-primary">{client.nom}</span>
                           <span className="text-caption text-secondary">{client.collaborateur}</span>
                         </div>
                         <Completude value={tauxCompletude(client)} />

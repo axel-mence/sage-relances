@@ -24,6 +24,18 @@ export function tauxCompletude(client: Client): number {
   return Math.round((recues / client.pieces.length) * 100)
 }
 
+// Seuils de couleur de la complétude : rouge sous 50 %, jaune de 50 à 79 %, vert à partir de 80 %
+export const SEUIL_COMPLETUDE_MOYEN = 50
+export const SEUIL_COMPLETUDE_BON = 80
+
+export type NiveauCompletude = 'faible' | 'moyen' | 'bon'
+
+export function niveauCompletude(taux: number): NiveauCompletude {
+  if (taux >= SEUIL_COMPLETUDE_BON) return 'bon'
+  if (taux >= SEUIL_COMPLETUDE_MOYEN) return 'moyen'
+  return 'faible'
+}
+
 export function derniereRelance(client: Client): Relance | undefined {
   return [...client.relances].sort((a, b) => b.date.localeCompare(a.date))[0]
 }

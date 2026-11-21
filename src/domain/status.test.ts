@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeStatus, tauxCompletude } from './status'
+import { computeStatus, niveauCompletude, tauxCompletude } from './status'
 import type { Client } from './types'
 
 const NOW = new Date('2026-11-20T12:00:00')
@@ -77,5 +77,16 @@ describe('tauxCompletude', () => {
   it('vaut 100 % quand tout est reçu ou qu’aucune pièce n’est attendue', () => {
     expect(tauxCompletude(makeClient({ pieces: [{ id: 'a', libelle: 'A', statut: 'recue' }] }))).toBe(100)
     expect(tauxCompletude(makeClient({ pieces: [] }))).toBe(100)
+  })
+})
+
+describe('niveauCompletude', () => {
+  it('passe du rouge au jaune à 50 %, puis au vert à 80 %', () => {
+    expect(niveauCompletude(0)).toBe('faible')
+    expect(niveauCompletude(49)).toBe('faible')
+    expect(niveauCompletude(50)).toBe('moyen')
+    expect(niveauCompletude(79)).toBe('moyen')
+    expect(niveauCompletude(80)).toBe('bon')
+    expect(niveauCompletude(100)).toBe('bon')
   })
 })
