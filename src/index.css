@@ -27,8 +27,20 @@
   --nudge-alert: #ff7a45; /* pièce manquante, à relancer */
 }
 
+/*
+  Variante « nudge: » : un style préfixé par nudge: ne s'applique qu'à l'intérieur d'un bloc
+  portant la classe .theme-nudge (fond sombre côté cabinet).
+  Exemple : class="bg-accent-strong nudge:bg-lime" → vert en v1, citron dans le thème Nudge.
+  Permet de rhabiller les composants sans casser les écrans pas encore passés en Nudge (étape 4).
+*/
+@custom-variant nudge (&:where(.theme-nudge, .theme-nudge *));
+
 /* « inline » : Tailwind recopie la variable telle quelle, ce qui permet de pointer vers --nudge-* */
 @theme inline {
+  /* Alias temporaires des 2 noms déjà pris en v1 (voir plus haut), retirés à l'étape 4 */
+  --color-nudge-surface: var(--nudge-surface);
+  --color-nudge-muted: var(--nudge-muted);
+
   --color-ink: var(--nudge-ink);
   --color-surface-2: var(--nudge-surface-2);
   --color-mist: var(--nudge-mist);
@@ -44,6 +56,11 @@
   /* Interlettrage des titres Sora (brief : -0.03em à -0.05em) et des labels de section en majuscules */
   --tracking-display: -0.04em;
   --tracking-label: 0.1em;
+  /* Chiffre clé (brief : 96 px) ramené à 48 px sur mobile et 64 px sur grand écran */
+  --text-figure: 48px;
+  --text-figure--line-height: 1;
+  --text-figure-lg: 64px;
+  --text-figure-lg--line-height: 1;
 
   /* Rayons Nudge : cartes, tuiles, bouton principal (arrondi complet) */
   --radius-card: 24px;
