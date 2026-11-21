@@ -33,11 +33,11 @@ Sage Experience se branche sur les outils existants du cabinet. La feature lit l
 - Écran 01 · Tableau de bord associé : temps gagné, recherche, filtres de statut en un clic + table de tous les clients (format Stripe), avec la complétude de chaque dossier.
 - Écran 03 · Fiche client en panneau latéral : pièces attendues, historique, relance individuelle.
 - Données mockées en JSON, servies comme une API (couche `api/` qui simule le logiciel comptable).
-- Relance simulée : le clic ajoute un événement à l'historique et met à jour le statut, aucun mail réel n'est envoyé.
+- Relance simulée avec **aperçu du mail** (ajout du 21/11/2026, demande d'Axel) : « Relancer » ouvre le mail pré-rédigé (destinataire, objet et message modifiables), « Envoyer la relance » ajoute un événement à l'historique et met à jour le statut. Aucun mail réel n'est envoyé.
 
 **Hors périmètre (itérations suivantes)**
 - Écran 02 · Sélection multiple et relance groupée.
-- Envoi réel de mails ou SMS, modèle de mail éditable, aide à la rédaction IA.
+- Envoi réel de mails ou SMS, modèles de mail enregistrés par le cabinet, aide à la rédaction IA.
 - Assignation à un collaborateur (bouton visible mais désactivé, avec info-bulle « Bientôt »).
 - Authentification, rôles, multi-cabinets, choix de la période.
 - Persistance serveur (l'état vit côté client pendant la session).
@@ -46,7 +46,7 @@ Sage Experience se branche sur les outils existants du cabinet. La feature lit l
 
 1. L'associé ouvre le tableau de bord. Le temps gagné, les filtres et la liste triée par urgence (en retard d'abord) sont visibles d'emblée.
 2. Il filtre la liste en un clic (Tous, En retard, En attente, Relancés, Complets) et / ou cherche un client ou un collaborateur. Les filtres et les titres de colonnes restent visibles pendant le défilement.
-3. Il clique sur « Relancer » sur une ligne : la relance est enregistrée, un toast confirme, le statut passe à « Relancée ».
+3. Il clique sur « Relancer » sur une ligne ou dans la fiche : l'aperçu du mail s'ouvre (adressé au contact du client, pièces manquantes listées, signé par le collaborateur). Il peut retoucher l'objet et le message, puis clique sur « Envoyer la relance » : la relance est enregistrée, un toast confirme, le statut passe à « Relancée ». « Annuler » ou Échap ne relance pas.
 4. Ou il clique sur une ligne ou sur « Voir » : le panneau latéral s'ouvre à droite, la liste reste visible derrière.
 5. Dans le panneau, il voit les pièces attendues (reçues cochées), l'historique, et peut relancer pour les pièces manquantes.
 6. Il ferme le panneau (croix, clic sur le fond, touche Échap).
@@ -61,17 +61,22 @@ Sage Experience se branche sur les outils existants du cabinet. La feature lit l
 - **Filtres de statut en un clic** : pastilles Tous, En retard, En attente, Relancés, Complets avec compteur, sur la même ligne que la recherche (format Stripe). Ils se combinent avec la recherche.
 - **Table plate au format Stripe** (décision d'Axel du 21/11/2026, remplace les groupes dépliables de la note N1) : tous les clients dans une seule liste, lignes séparées par un filet.
 - **Colonnes** : Client (+ collaborateur) · Statut (badge) · Complétude (jauge + % de pièces reçues) · Pièces manquantes (nombre + résumé dès 1536 px) · Échéance · Dernière relance (dès 1280 px) · boutons « Voir » et « Relancer ».
-- **Tri par urgence** : en retard, en attente, relancés, complets ; à statut égal, échéance la plus proche puis nombre de pièces manquantes décroissant.
+- **Tri par gravité** : en retard, en attente, relancés, complets ; à statut égal (et dans une pastille), complétude la plus faible en haut, puis échéance la plus proche.
 - **Scroll collant** (grand écran) : la barre de recherche et de filtres et les titres de colonnes restent visibles pendant le défilement.
 
 ### 03 · Fiche client (panneau latéral)
 - Largeur 440 px, ancré à droite, fond légèrement assombri derrière.
-- En-tête : nom du client, collaborateur, régime de TVA, croix.
+- En-tête : nom du client, collaborateur, régime de TVA, contact du client (nom et e-mail cliquable), croix.
 - Badge de statut + échéance (« dépassée de 2 jours » si en retard).
 - Complétude : « n pièces reçues sur N » + jauge et pourcentage.
 - **Pièces attendues de la période** : liste avec case cochée si reçue (texte grisé).
 - **Historique des relances** : timeline du plus récent au plus ancien.
-- Actions : « Relancer (n pièces) » (primaire) · « Assigner » (secondaire, désactivé en V1).
+- Actions : « Relancer (n pièces) » (primaire, ouvre l'aperçu du mail) · « Assigner » (secondaire, désactivé en V1).
+
+### Aperçu du mail de relance (fenêtre)
+- Fenêtre centrée au-dessus du tableau ou de la fiche, plein largeur sur mobile.
+- **À** : contact du client (non modifiable). **Objet** : « Pièces manquantes · TVA [période] ». **Message** : prénom du contact, liste des pièces manquantes, demande avant l'échéance (ou « au plus vite » si elle est dépassée), signature du collaborateur et du cabinet.
+- Objet et message modifiables. Actions : « Annuler » (secondaire) · « Envoyer la relance » (primaire, en chargement pendant l'envoi). Échec : toast d'erreur, la fenêtre reste ouverte.
 
 ## 8. États
 
@@ -109,9 +114,12 @@ interface Relance {
   canal: "mail";
 }
 
+interface Contact { nom: string; email: string; }  // interlocuteur côté client
+
 interface Client {
   id: string;
   nom: string;
+  contact: Contact;
   collaborateurId: string;
   regimeTva: "mensuelle" | "trimestrielle";
   echeance: string;         // ISO date
@@ -194,7 +202,8 @@ Un commit par étape au minimum, message au format `feat(scope): description`.
 - [ ] Un clic sur une pastille filtre la liste ; les compteurs des pastilles correspondent aux lignes affichées.
 - [ ] Les filtres et les titres de colonnes restent visibles pendant le défilement.
 - [ ] La complétude de chaque dossier correspond aux pièces reçues sur les pièces attendues.
-- [ ] « Relancer » sur une ligne passe le statut à « Relancée », met « Dernière relance » à « À l'instant » et ajoute un événement visible dans le panneau.
+- [ ] « Relancer » ouvre l'aperçu du mail adressé au contact du client ; « Annuler » ne change rien.
+- [ ] « Envoyer la relance » passe le statut à « Relancée », met « Dernière relance » à « À l'instant » et ajoute un événement visible dans le panneau.
 - [ ] Un client complet n'a pas de bouton « Relancer » actif.
 - [ ] Le panneau s'ouvre au clic sur une ligne et se ferme avec la croix, le fond ou Échap.
 - [ ] Les états vide, chargement et erreur sont visibles (via `?fail=1` pour l'erreur).

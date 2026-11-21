@@ -28,6 +28,8 @@ export const MINUTES_GAGNEES_PAR_RELANCE = 10
 
 // Personne connectée (pas d'authentification en V1)
 export const UTILISATEUR_CONNECTE = 'Claire Lemoine'
+// Cabinet fictif : affiché dans la barre latérale et en signature des mails de relance
+export const NOM_CABINET = 'Cabinet Lemoine'
 
 const JOUR_MS = 24 * 60 * 60 * 1000
 

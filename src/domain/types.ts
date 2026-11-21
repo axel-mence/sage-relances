@@ -26,9 +26,16 @@ export interface Relance {
   canal: 'mail'
 }
 
+// Interlocuteur côté client (gérant ou responsable administratif), destinataire des relances
+export interface Contact {
+  nom: string
+  email: string
+}
+
 export interface Client {
   id: string
   nom: string
+  contact: Contact
   collaborateurId: string
   regimeTva: 'mensuelle' | 'trimestrielle'
   echeance: string // date ISO (AAAA-MM-JJ)
