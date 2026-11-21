@@ -6,7 +6,7 @@ type SearchFieldProps = {
 // Barre de recherche de la liste : filtre par nom de client ou de collaborateur
 export function SearchField({ value, onChange }: SearchFieldProps) {
   return (
-    <div className="relative w-full sm:max-w-sm">
+    <div className="relative w-full sm:max-w-sm lg:max-w-xs">
       <label htmlFor="recherche-client" className="sr-only">
         Rechercher un client ou un collaborateur
       </label>

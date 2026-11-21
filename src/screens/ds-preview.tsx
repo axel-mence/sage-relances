@@ -33,7 +33,7 @@ function Apercu() {
           <StatusBadge status="en_retard" />
           <StatusBadge status="relancee" />
         </div>
-        <StatusPills counts={{ en_retard: 6, en_attente: 7, relancee: 3, complet: 8 }} onSelect={() => {}} />
+        <StatusPills counts={{ tous: 24, en_retard: 6, en_attente: 7, relancee: 3, complet: 8 }} value="en_retard" onChange={() => {}} />
         <div className="flex flex-wrap gap-6">
           <Completude value={33} />
           <Completude value={60} />
