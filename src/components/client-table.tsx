@@ -109,8 +109,12 @@ export function ClientTable({ clients, now, onRelancer, onOpen, pendingIds }: Cl
       <div className="hidden rounded-md border border-border bg-surface lg:block">
         <table className="w-full text-left whitespace-nowrap">
           {/* Titres de colonnes autorisés sur 2 lignes entre 1024 et 1280 px pour gagner de la place */}
-          <thead className="text-caption text-muted lg:whitespace-normal xl:whitespace-nowrap">
-            <tr className="border-b border-border">
+          {/*
+            Titres de colonnes collants : ils restent visibles sous la barre de filtres pendant le défilement.
+            --filters-h est fournie par le tableau de bord (hauteur de la barre de filtres).
+          */}
+          <thead className="text-caption text-muted lg:whitespace-normal xl:whitespace-nowrap [&_th]:sticky [&_th]:top-(--filters-h) [&_th]:z-10 [&_th]:bg-surface [&_th]:shadow-[inset_0_-1px_0_var(--color-border)] [&_th:first-child]:rounded-tl-md [&_th:last-child]:rounded-tr-md">
+            <tr>
               <th scope="col" className={`${CELL} font-medium`}>Client</th>
               <th scope="col" className={`${CELL} font-medium`}>Statut</th>
               <th scope="col" className={`${NUM} font-medium`}>Complétude</th>

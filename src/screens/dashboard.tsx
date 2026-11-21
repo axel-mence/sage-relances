@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import { api } from '../api/clients-api'
 import { ClientTable } from '../components/client-table'
 import { ListEmpty, ListError, ListNoResult, ListSkeleton } from '../components/list-states'
@@ -11,6 +11,7 @@ import { FILTERS, URGENCE, type StatusFilter } from '../domain/filters'
 import { formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
 import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
+import { useElementHeight } from '../hooks/use-element-height'
 import { useNow } from '../hooks/use-now'
 import { ClientPanel } from './client-panel'
 import { useToasts } from '../hooks/use-toasts'
@@ -24,6 +25,9 @@ export function Dashboard() {
   const [query, setQuery] = useState('')
   // Filtre de statut (pastilles d'un clic) : « Tous » par défaut
   const [filter, setFilter] = useState<StatusFilter>('tous')
+  // Barre de filtres collée en haut (sticky) : sa hauteur sert à coller les titres de colonnes juste dessous
+  const [filtersBar, setFiltersBar] = useState<HTMLDivElement | null>(null)
+  const filtersHeight = useElementHeight(filtersBar)
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
   // Client affiché dans le panneau latéral (aucun si fermé)
   const [selectedId, setSelectedId] = useState<string>()
@@ -106,14 +110,25 @@ export function Dashboard() {
           />
         </header>
 
-        {/* Recherche + pastilles d'état (raccourcis vers les groupes) */}
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <SearchField value={query} onChange={setQuery} />
-          {clients.data && <StatusPills counts={counts} value={filter} onChange={setFilter} />}
-        </div>
+        <section
+          aria-label="Liste des clients"
+          className="flex flex-col"
+          // Hauteur de la barre de filtres, lue par les titres de colonnes collants (voir client-table)
+          style={{ '--filters-h': `${filtersHeight}px` } as CSSProperties}
+        >
+          {/*
+            Recherche + pastilles de filtre. Sur grand écran, la barre reste collée en haut pendant le défilement
+            (sticky), sur fond de page pour masquer les lignes qui passent dessous.
+          */}
+          <div
+            ref={setFiltersBar}
+            className="z-20 flex flex-col gap-3 bg-page pb-4 lg:sticky lg:top-0 lg:flex-row lg:items-center lg:justify-between lg:pt-4"
+          >
+            <SearchField value={query} onChange={setQuery} />
+            {clients.data && <StatusPills counts={counts} value={filter} onChange={setFilter} />}
+          </div>
 
-        <section aria-label="Clients par statut" className="flex flex-col gap-4">
-          {/* États de la liste : chargement, erreur, vide, puis groupes (spec, section 8) */}
+          {/* États de la liste : chargement, erreur, vide, puis table (spec, section 8) */}
           <div>
             {clients.loading ? (
               <ListSkeleton />
