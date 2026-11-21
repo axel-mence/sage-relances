@@ -8,6 +8,8 @@ type ClientTableProps = {
   clients: ClientView[]
   now: Date
   onRelancer: (client: ClientView) => void
+  // Ouvre la fiche client (panneau latéral)
+  onOpen: (client: ClientView) => void
   // Clients dont la relance est en cours d'envoi (bouton en chargement)
   pendingIds: Set<string>
 }
@@ -58,7 +60,11 @@ function RelancerButton({ client, pending, onRelancer }: RelancerButtonProps) {
       variant="secondary"
       disabled={client.nbManquantes === 0}
       loading={pending}
-      onClick={() => onRelancer(client)}
+      onClick={(event) => {
+        // Ne pas ouvrir la fiche en plus : le clic sur la ligne entière ouvre le panneau
+        event.stopPropagation()
+        onRelancer(client)
+      }}
       aria-label={`Relancer ${client.nom}`}
     >
       Relancer
@@ -66,7 +72,24 @@ function RelancerButton({ client, pending, onRelancer }: RelancerButtonProps) {
   )
 }
 
-export function ClientTable({ clients, now, onRelancer, pendingIds }: ClientTableProps) {
+// Nom du client cliquable : c'est lui qui rend la ligne accessible au clavier (Tab puis Entrée)
+function OpenButton({ client, onOpen }: { client: ClientView; onOpen: (client: ClientView) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={(event) => {
+        event.stopPropagation()
+        onOpen(client)
+      }}
+      aria-haspopup="dialog"
+      className="cursor-pointer rounded-sm text-left text-label text-primary hover:underline"
+    >
+      {client.nom}
+    </button>
+  )
+}
+
+export function ClientTable({ clients, now, onRelancer, onOpen, pendingIds }: ClientTableProps) {
   return (
     <>
       {/* Grand écran : vrai tableau */}
@@ -87,9 +110,13 @@ export function ClientTable({ clients, now, onRelancer, pendingIds }: ClientTabl
           </thead>
           <tbody>
             {clients.map((client) => (
-              <tr key={client.id} className="border-b border-border last:border-b-0 hover:bg-page">
+              <tr
+                key={client.id}
+                onClick={() => onOpen(client)}
+                className="cursor-pointer border-b border-border last:border-b-0 hover:bg-page"
+              >
                 <th scope="row" className="px-3 py-3 text-left font-normal">
-                  <span className="block text-label text-primary">{client.nom}</span>
+                  <OpenButton client={client} onOpen={onOpen} />
                   {/* Collaborateur sous le nom quand la colonne dédiée est masquée */}
                   <span className="block text-caption text-secondary xl:hidden">{client.collaborateur}</span>
                 </th>
@@ -108,10 +135,14 @@ export function ClientTable({ clients, now, onRelancer, pendingIds }: ClientTabl
       {/* Mobile et tablette : une carte par client */}
       <ul className="flex flex-col gap-3 lg:hidden">
         {clients.map((client) => (
-          <li key={client.id} className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4">
+          <li
+            key={client.id}
+            onClick={() => onOpen(client)}
+            className="flex cursor-pointer flex-col gap-3 rounded-lg border border-border bg-surface p-4"
+          >
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 flex-col">
-                <span className="text-label text-primary">{client.nom}</span>
+                <OpenButton client={client} onOpen={onOpen} />
                 <span className="text-caption text-secondary">{client.collaborateur}</span>
               </div>
               <StatusBadge status={client.statut} />

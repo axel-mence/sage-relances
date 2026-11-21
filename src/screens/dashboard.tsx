@@ -10,6 +10,7 @@ import { formatDuree, formatJourMois, formatPeriode, prochaineEcheanceTva } from
 import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useNow } from '../hooks/use-now'
+import { ClientPanel } from './client-panel'
 import { useToasts } from '../hooks/use-toasts'
 
 // Écran 01 · Tableau de bord associé (spec, section 7)
@@ -20,22 +21,27 @@ export function Dashboard() {
   const clients = useAsync(api.getClients)
   const [filter, setFilter] = useState<StatusFilter>('en_retard')
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
+  // Client affiché dans le panneau latéral (aucun si fermé)
+  const [selectedId, setSelectedId] = useState<string>()
   const toasts = useToasts()
 
   /*
     Relance d'un client (parcours, étape 3) :
     bouton en chargement → appel API → succès : toast, client remplacé (statut « Relancée »), KPI rafraîchis
                                      → échec : toast d'erreur, rien ne change
+    Utilisée par le tableau et par le panneau : renvoie le client à jour, ou rien en cas d'échec.
   */
-  async function handleRelancer(client: ClientView) {
+  async function handleRelancer(client: ClientView): Promise<ClientView | undefined> {
     setPendingIds((ids) => new Set(ids).add(client.id))
     try {
       const updated = await api.postRelance(client.id)
       clients.update((list) => list.map((c) => (c.id === updated.id ? updated : c)))
       kpis.reload({ silent: true })
       toasts.show(`Relance envoyée à ${client.nom}`)
+      return updated
     } catch {
       toasts.show(`La relance de ${client.nom} n'a pas pu être envoyée. Réessayez.`, 'error')
+      return undefined
     } finally {
       setPendingIds((ids) => {
         const next = new Set(ids)
@@ -56,6 +62,8 @@ export function Dashboard() {
 
   // Props communes aux 4 cartes : chargement et erreur (spec, section 8)
   const kpiState = { loading: kpis.loading, unavailable: !!kpis.error }
+
+  const toastZone = <Toasts toasts={toasts.toasts} onDismiss={toasts.dismiss} />
 
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
@@ -108,13 +116,31 @@ export function Dashboard() {
             ) : clients.error ? (
               <p className="text-status-retard">Impossible de récupérer les dossiers</p>
             ) : (
-              <ClientTable clients={visibleClients} now={now} onRelancer={handleRelancer} pendingIds={pendingIds} />
+              <ClientTable
+                clients={visibleClients}
+                now={now}
+                onRelancer={handleRelancer}
+                onOpen={(client) => setSelectedId(client.id)}
+                pendingIds={pendingIds}
+              />
             )}
           </div>
         </section>
       </main>
 
-      <Toasts toasts={toasts.toasts} onDismiss={toasts.dismiss} />
+      {selectedId && (
+        <ClientPanel
+          clientId={selectedId}
+          now={now}
+          pending={pendingIds.has(selectedId)}
+          onRelancer={handleRelancer}
+          onClose={() => setSelectedId(undefined)}
+          toasts={toastZone}
+        />
+      )}
+
+      {/* Une seule zone de toasts à la fois : dans le panneau s'il est ouvert, sinon ici */}
+      {!selectedId && toastZone}
     </div>
   )
 }

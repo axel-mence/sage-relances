@@ -28,6 +28,23 @@ export function formatEcheance(isoDate: string): string {
   return jourMoisCourt.format(new Date(`${isoDate}T00:00:00`))
 }
 
+const dateHeure = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+
+// Date et heure d'une relance : « 19 nov. à 10:00 »
+export function formatDateHeure(iso: string): string {
+  return dateHeure.format(new Date(iso)).replace(',', ' à')
+}
+
+// Échéance en clair pour la fiche client : « dépassée de 2 jours », « aujourd'hui », « dans 3 jours »
+export function formatEcheanceRelative(isoDate: string, now: Date): string {
+  const echeance = new Date(`${isoDate}T00:00:00`)
+  const aujourdhui = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const jours = Math.round((echeance.getTime() - aujourdhui.getTime()) / (24 * 60 * 60 * 1000))
+  const pluriel = (n: number) => `${n} jour${n > 1 ? 's' : ''}`
+  if (jours === 0) return "aujourd'hui"
+  return jours < 0 ? `dépassée de ${pluriel(-jours)}` : `dans ${pluriel(jours)}`
+}
+
 const HEURE_MS = 60 * 60 * 1000
 const JOUR_MS = 24 * HEURE_MS
 
