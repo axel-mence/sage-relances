@@ -1,5 +1,78 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   DA Nudge (brief : DA/nudge-handoff-claude-code.md)
+   Les couleurs vivent dans des variables CSS --nudge-*, puis Tailwind les expose
+   en classes : --color-lime → bg-lime, text-lime, border-lime…
+
+   Transition en cours (branche feat/da-nudge) : les tokens du DS v1 plus bas
+   restent actifs tant que les écrans ne sont pas rhabillés. Deux noms du brief
+   existent déjà en v1 avec une autre valeur : « surface » (blanc en v1) et
+   « muted » (gris texte en v1). Ils basculeront sur les valeurs Nudge à l'étape 4,
+   avec le passage du tableau de bord en sombre. En attendant, leurs valeurs Nudge
+   sont disponibles sous --nudge-surface et --nudge-muted.
+   ========================================================================== */
+:root {
+  /* Base */
+  --nudge-ink: #090b0b;
+  --nudge-surface: #131716;
+  --nudge-surface-2: #1c2221;
+  --nudge-mist: #f2f4ee;
+  --nudge-muted: #8a938f;
+
+  /* Accents */
+  --nudge-lime: #d4f53c; /* action principale */
+  --nudge-green: #3de86b; /* succès, pièce reçue */
+  --nudge-teal: #0f3d3e; /* blocs secondaires */
+  --nudge-alert: #ff7a45; /* pièce manquante, à relancer */
+}
+
+/* « inline » : Tailwind recopie la variable telle quelle, ce qui permet de pointer vers --nudge-* */
+@theme inline {
+  --color-ink: var(--nudge-ink);
+  --color-surface-2: var(--nudge-surface-2);
+  --color-mist: var(--nudge-mist);
+  --color-lime: var(--nudge-lime);
+  --color-green: var(--nudge-green);
+  --color-teal: var(--nudge-teal);
+  --color-alert: var(--nudge-alert);
+}
+
+@theme {
+  /* Typo Nudge : Sora pour les titres, chiffres clés et le logo (chargée dans index.html) */
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  /* Interlettrage des titres Sora (brief : -0.03em à -0.05em) et des labels de section en majuscules */
+  --tracking-display: -0.04em;
+  --tracking-label: 0.1em;
+
+  /* Rayons Nudge : cartes, tuiles, bouton principal (arrondi complet) */
+  --radius-card: 24px;
+  --radius-tile: 16px;
+  --radius-pill: 999px;
+}
+
+/* Fond sombre (hero, barre latérale, connexion côté cabinet) : noir profond + halo vert émeraude */
+@utility bg-nudge-dark {
+  background:
+    radial-gradient(35% 45% at 100% 35%, rgba(61, 232, 107, 0.12), transparent 100%),
+    radial-gradient(45% 50% at 5% 0%, rgba(26, 92, 69, 0.55), transparent 100%),
+    radial-gradient(75% 85% at 50% 105%, rgba(31, 122, 87, 0.95) 0%, rgba(18, 74, 54, 0.6) 45%, transparent 100%),
+    #050807;
+}
+
+/* Fond clair (page de dépôt côté client, mobile) */
+@utility bg-nudge-light {
+  background:
+    radial-gradient(35% 45% at 100% 35%, rgba(61, 232, 107, 0.08), transparent 100%),
+    radial-gradient(45% 50% at 5% 0%, rgba(228, 247, 200, 0.8), transparent 100%),
+    radial-gradient(80% 85% at 50% 105%, rgba(191, 235, 203, 0.9) 0%, rgba(221, 243, 226, 0.6) 45%, transparent 100%),
+    #fbfcfa;
+}
+
+/* ==========================================================================
+   DS v1 / v2 (avant Nudge) : remplacé progressivement aux étapes 3 et 4
+   ========================================================================== */
+
 /*
   Design system temporaire v1 (source : Figma, page « DS temporaire (v1) »).
   Chaque token devient une classe Tailwind : --color-accent → bg-accent, text-accent, border-accent…
@@ -37,14 +110,6 @@
   --color-status-relancee: #111111;
   --color-status-relancee-bg: #ededed;
 
-  /*
-    DS v2 · Dégradé « retard » (note N2) : utilisé uniquement dans la barre de répartition.
-    Couleurs v1 d'origine, sans texte posé dessus : l'ajustement AA de status-attente ne s'applique pas ici.
-  */
-  --color-gradient-retard-start: #56a538;
-  --color-gradient-retard-mid: #b26b00;
-  --color-gradient-retard-end: #c2382d;
-
   /* Typo : Inter, chargée dans index.html */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
@@ -76,16 +141,6 @@
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
-}
-
-/* DS v2 · Classe « bg-gradient-retard » : vert (à jour) → orange (retard léger) → rouge (retard fort) */
-@utility bg-gradient-retard {
-  background-image: linear-gradient(
-    to right,
-    var(--color-gradient-retard-start),
-    var(--color-gradient-retard-mid),
-    var(--color-gradient-retard-end)
-  );
 }
 
 /* DS v2 · Chiffres tabulaires (largeur fixe) dans les tableaux : les colonnes de nombres et de dates restent alignées */
