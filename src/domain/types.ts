@@ -51,6 +51,7 @@ export interface Client {
 
 // Client enrichi par l'API : ce que l'écran affiche directement
 export interface ClientView extends Client {
+  slug: string // « garage-peyrot » : adresse de la fiche (/clients/garage-peyrot)
   statut: DossierStatus
   collaborateur: string // nom du collaborateur
   nbManquantes: number

@@ -4,6 +4,7 @@
 
     GET  /api/clients?statut=…      → getClients(statut)
     GET  /api/clients/:id           → getClient(id)
+    GET  /api/clients?slug=…        → getClientBySlug(slug)
     GET  /api/kpis                  → getKpis()
     POST /api/clients/:id/relances  → postRelance(id)
 
@@ -11,6 +12,7 @@
 */
 import rawData from '../data/clients.json'
 import { composeRelance, type MailRelance } from '../domain/mail'
+import { slugify } from '../domain/slug'
 import { computeStatus, derniereRelance, piecesManquantes } from '../domain/status'
 import type { Client, ClientView, Collaborateur, DossierStatus, Kpis, Relance } from '../domain/types'
 
@@ -43,6 +45,8 @@ export const NOM_CABINET = 'Cabinet Lemoine'
 const JOUR_MS = 24 * 60 * 60 * 1000
 
 export class ApiError extends Error {}
+// Adresse de fiche qui ne correspond à aucun client : la page affiche « introuvable » au lieu d'une erreur réseau
+export class ClientIntrouvable extends ApiError {}
 
 type ApiOptions = {
   data?: Dataset
@@ -127,6 +131,7 @@ export function createApi({
     const collaborateur = db.collaborateurs.find((c) => c.id === client.collaborateurId)
     return {
       ...client,
+      slug: slugify(client.nom),
       statut: computeStatus(client, now()),
       collaborateur: collaborateur?.nom ?? 'Non assigné',
       nbManquantes: piecesManquantes(client).length,
@@ -159,6 +164,15 @@ export function createApi({
     // GET /api/clients/:id
     getClient(id: string) {
       return network(() => toView(findClient(id)))
+    },
+
+    // GET /api/clients?slug=… : fiche ouverte depuis son adresse (/clients/garage-peyrot)
+    getClientBySlug(slug: string) {
+      return network(() => {
+        const client = db.clients.find((c) => slugify(c.nom) === slug)
+        if (!client) throw new ClientIntrouvable()
+        return toView(client)
+      })
     },
 
     // GET /api/kpis
