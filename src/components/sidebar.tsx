@@ -1,60 +1,92 @@
 import { UTILISATEUR_CONNECTE } from '../api/clients-api'
 import { Avatar } from './avatar'
+import { NavIcon, type NavIconName } from './nav-icon'
 import { NudgeLogo } from './nudge-logo'
 import { ThemeToggle } from './theme-toggle'
 
 const NOM_CABINET = 'Cabinet Lemoine'
 
+type NavItem = { label: string; icon: NavIconName; active?: boolean }
+
 // Seul le tableau de bord existe en V1 : les autres entrées sont visibles mais inactives (spec, écran 01)
-const NAV_ITEMS = [
-  { label: 'Tableau de bord', active: true },
-  { label: 'Clients', active: false },
-  { label: 'Relances', active: false },
-  { label: 'Paramètres', active: false },
+const MAIN_ITEMS: NavItem[] = [
+  { label: 'Tableau de bord', icon: 'home', active: true },
+  { label: 'Clients', icon: 'clients' },
+  { label: 'Relances', icon: 'relances' },
 ]
+
+// Entrées secondaires, en bas de la barre (comme l'administration chez n8n)
+const FOOTER_ITEMS: NavItem[] = [
+  { label: 'Paramètres', icon: 'parametres' },
+  { label: 'Aide', icon: 'aide' },
+]
+
+// Base commune des lignes de navigation : picto + libellé, hauteur 40 px
+const ROW = 'flex h-10 items-center gap-3 rounded-sm px-3 text-body'
+
+function NavLink({ item }: { item: NavItem }) {
+  if (item.active) {
+    return (
+      <a href="/" aria-current="page" className={`${ROW} bg-accent-subtle font-medium text-accent`}>
+        <NavIcon name={item.icon} />
+        {item.label}
+      </a>
+    )
+  }
+  return (
+    <span aria-disabled="true" title="Bientôt" className={`${ROW} cursor-not-allowed text-secondary`}>
+      <NavIcon name={item.icon} />
+      {item.label}
+      <span className="ml-auto text-caption text-muted">Bientôt</span>
+    </span>
+  )
+}
+
+function NavList({ items }: { items: NavItem[] }) {
+  return (
+    <ul className="flex flex-col gap-1">
+      {items.map((item) => (
+        <li key={item.label}>
+          <NavLink item={item} />
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 /*
   Barre latérale sur grand écran (lg et plus), sur le fond dégradé Nudge du thème actif (clair ou sombre).
-  Collée en haut (sticky) et haute d'un écran exactement : elle ne défile jamais avec la page,
-  et le bloc utilisateur reste toujours visible en bas.
+  Structure reprise de n8n : navigation principale, section « Cabinet », entrées secondaires en bas,
+  puis le bloc utilisateur. Collée en haut (sticky) et haute d'un écran exactement :
+  elle ne défile jamais avec la page, et le bloc utilisateur reste toujours visible en bas.
 */
 export function Sidebar() {
   return (
-    <aside className="bg-nudge-light dark:bg-nudge-dark sticky top-0 hidden h-dvh w-60 shrink-0 flex-col justify-between overflow-y-auto border-r border-border p-4 lg:flex">
-      <div className="flex flex-col gap-8">
-        <div className="flex flex-col gap-1 px-3 pt-2">
-          <NudgeLogo className="h-7 text-primary" />
-          <span className="text-caption text-muted">{NOM_CABINET}</span>
-        </div>
-        <nav aria-label="Navigation principale">
-          <ul className="flex flex-col gap-1">
-            {NAV_ITEMS.map((item) => (
-              <li key={item.label}>
-                {item.active ? (
-                  <a
-                    href="/"
-                    aria-current="page"
-                    className="flex h-9 items-center rounded-sm bg-accent-subtle px-3 text-label text-accent"
-                  >
-                    {item.label}
-                  </a>
-                ) : (
-                  <span
-                    aria-disabled="true"
-                    title="Bientôt"
-                    className="flex h-9 cursor-not-allowed items-center justify-between rounded-sm px-3 text-label text-muted"
-                  >
-                    {item.label}
-                    <span className="text-caption">Bientôt</span>
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
+    <aside className="bg-nudge-light dark:bg-nudge-dark sticky top-0 hidden h-dvh w-60 shrink-0 flex-col overflow-y-auto border-r border-border lg:flex">
+      <div className="px-6 pt-6 pb-4">
+        <NudgeLogo className="h-7 text-primary" />
       </div>
 
-      <div className="flex flex-col gap-4 border-t border-border px-3 pt-4">
+      <nav aria-label="Navigation principale" className="flex flex-1 flex-col">
+        <div className="px-3 pb-4">
+          <NavList items={MAIN_ITEMS} />
+        </div>
+
+        {/* Section « Cabinet » séparée par des filets, comme « Projects » chez n8n */}
+        <div className="flex flex-col gap-2 border-y border-border px-3 py-4">
+          <span className="px-3 text-caption text-muted">Cabinet</span>
+          <span className={`${ROW} text-primary`}>
+            <NavIcon name="cabinet" />
+            {NOM_CABINET}
+          </span>
+        </div>
+
+        <div className="mt-auto px-3 py-4">
+          <NavList items={FOOTER_ITEMS} />
+        </div>
+      </nav>
+
+      <div className="flex flex-col gap-4 border-t border-border px-6 py-4">
         <ThemeToggle />
         <div className="flex items-center gap-3">
           <Avatar />
