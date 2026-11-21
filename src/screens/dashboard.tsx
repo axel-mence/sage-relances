@@ -15,6 +15,7 @@ import { useAsync } from '../hooks/use-async'
 import { useElementHeight } from '../hooks/use-element-height'
 import { useNow } from '../hooks/use-now'
 import { ClientPanel } from './client-panel'
+import { MailPreview } from './mail-preview'
 import { useToasts } from '../hooks/use-toasts'
 
 // Écran 01 · Tableau de bord associé (spec, section 7)
@@ -58,6 +59,30 @@ export function Dashboard() {
         return next
       })
     }
+  }
+
+  /*
+    Aperçu du mail avant l'envoi : « Relancer » (table ou fiche) ouvre la fenêtre d'aperçu,
+    et la promesse se résout quand elle se ferme : avec le client à jour si la relance est partie, sinon rien.
+    Le tableau et la fiche n'ont donc pas à savoir qu'un aperçu s'intercale.
+  */
+  const [draft, setDraft] = useState<{ client: ClientView; resolve: (updated?: ClientView) => void }>()
+
+  function requestRelance(client: ClientView) {
+    return new Promise<ClientView | undefined>((resolve) => setDraft({ client, resolve }))
+  }
+
+  async function sendDraft() {
+    if (!draft) return false
+    const updated = await handleRelancer(draft.client)
+    if (updated) draft.resolve(updated)
+    return Boolean(updated)
+  }
+
+  function closeDraft() {
+    // Sans effet si la promesse est déjà résolue (relance envoyée)
+    draft?.resolve(undefined)
+    setDraft(undefined)
   }
 
   // Nombre de clients par filtre (pastilles), calculé sur toute la liste
@@ -157,7 +182,7 @@ export function Dashboard() {
               <ClientTable
                 clients={visibleClients}
                 now={now}
-                onRelancer={handleRelancer}
+                onRelancer={requestRelance}
                 onOpen={(client) => setSelectedId(client.id)}
                 pendingIds={pendingIds}
               />
@@ -171,14 +196,27 @@ export function Dashboard() {
           clientId={selectedId}
           now={now}
           pending={pendingIds.has(selectedId)}
-          onRelancer={handleRelancer}
+          onRelancer={requestRelance}
           onClose={() => setSelectedId(undefined)}
+          toasts={draft ? null : toastZone}
+        />
+      )}
+
+      {draft && (
+        <MailPreview
+          // Une nouvelle fenêtre (et un nouveau brouillon) par client
+          key={draft.client.id}
+          client={draft.client}
+          now={now}
+          pending={pendingIds.has(draft.client.id)}
+          onSend={sendDraft}
+          onClose={closeDraft}
           toasts={toastZone}
         />
       )}
 
-      {/* Une seule zone de toasts à la fois : dans le panneau s'il est ouvert, sinon ici */}
-      {!selectedId && toastZone}
+      {/* Une seule zone de toasts à la fois : dans l'aperçu ou le panneau s'ils sont ouverts, sinon ici */}
+      {!draft && !selectedId && toastZone}
     </div>
   )
 }

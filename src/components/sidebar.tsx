@@ -1,10 +1,8 @@
-import { UTILISATEUR_CONNECTE } from '../api/clients-api'
+import { NOM_CABINET, UTILISATEUR_CONNECTE } from '../api/clients-api'
 import { Avatar } from './avatar'
 import { NavIcon, type NavIconName } from './nav-icon'
 import { NudgeLogo } from './nudge-logo'
 import { ThemeToggle } from './theme-toggle'
-
-const NOM_CABINET = 'Cabinet Lemoine'
 
 type NavItem = { label: string; icon: NavIconName; active?: boolean }
 
