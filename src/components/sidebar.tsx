@@ -1,4 +1,5 @@
 import { NOM_CABINET, UTILISATEUR_CONNECTE } from '../api/clients-api'
+import { navigate } from '../hooks/use-route'
 import { Avatar } from './avatar'
 import { NavIcon, type NavIconName } from './nav-icon'
 import { NudgeLogo } from './nudge-logo'
@@ -6,10 +7,12 @@ import { ThemeToggle } from './theme-toggle'
 
 type NavItem = { label: string; icon: NavIconName; active?: boolean }
 
-// Seul le tableau de bord existe en V1 : les autres entrées sont visibles mais inactives (spec, écran 01)
+/*
+  « Clients » mène à la liste et reste actif sur les fiches (ex-« Tableau de bord », spec-clients-relances, section 5).
+  « Relances » arrive avec la partie 2 : visible mais inactive.
+*/
 const MAIN_ITEMS: NavItem[] = [
-  { label: 'Tableau de bord', icon: 'home', active: true },
-  { label: 'Clients', icon: 'clients' },
+  { label: 'Clients', icon: 'clients', active: true },
   { label: 'Relances', icon: 'relances' },
 ]
 
@@ -25,7 +28,16 @@ const ROW = 'flex h-10 items-center gap-3 rounded-sm px-3 text-body'
 function NavLink({ item }: { item: NavItem }) {
   if (item.active) {
     return (
-      <a href="/" aria-current="page" className={`${ROW} bg-accent-subtle font-medium text-accent`}>
+      <a
+        href="/"
+        aria-current="page"
+        // Navigation sans rechargement : la liste garde ses données
+        onClick={(event) => {
+          event.preventDefault()
+          navigate('/')
+        }}
+        className={`${ROW} bg-accent-subtle font-medium text-accent`}
+      >
         <NavIcon name={item.icon} />
         {item.label}
       </a>

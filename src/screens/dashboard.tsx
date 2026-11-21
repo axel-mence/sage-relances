@@ -1,9 +1,8 @@
-import { useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { api } from '../api/clients-api'
 import { ClientTable } from '../components/client-table'
 import { ListEmpty, ListError, ListNoResult, ListSkeleton } from '../components/list-states'
 import { SearchField } from '../components/search-field'
-import { MobileTopBar, Sidebar } from '../components/sidebar'
 import { StatusPills } from '../components/status-pills'
 import { TimeSaved } from '../components/time-saved'
 import { Toasts } from '../components/toasts'
@@ -14,12 +13,17 @@ import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useElementHeight } from '../hooks/use-element-height'
 import { useNow } from '../hooks/use-now'
-import { ClientPanel } from './client-panel'
+import { navigate } from '../hooks/use-route'
 import { MailPreview } from './mail-preview'
 import { useToasts } from '../hooks/use-toasts'
 
-// Écran 01 · Tableau de bord associé (spec, section 7)
-export function Dashboard() {
+type DashboardProps = {
+  // Faux quand une fiche client est ouverte : la liste reste montée mais cachée (état conservé)
+  active: boolean
+}
+
+// Écran 01 · Liste des clients (spec, section 7)
+export function Dashboard({ active }: DashboardProps) {
   const now = useNow()
   const kpis = useAsync(api.getKpis)
   // On charge tous les clients une fois et on filtre ici : les compteurs des pastilles restent justes
@@ -31,8 +35,6 @@ export function Dashboard() {
   const [filtersBar, setFiltersBar] = useState<HTMLDivElement | null>(null)
   const filtersHeight = useElementHeight(filtersBar)
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
-  // Client affiché dans le panneau latéral (aucun si fermé)
-  const [selectedId, setSelectedId] = useState<string>()
   const toasts = useToasts()
 
   /*
@@ -88,6 +90,22 @@ export function Dashboard() {
     setDraft(undefined)
   }
 
+  /*
+    Retour sur la liste après une fiche : on rafraîchit sans squelette, pour refléter une relance faite dans la fiche.
+    Pas au premier affichage (les données viennent d'être chargées).
+  */
+  const dejaAffichee = useRef(false)
+  const reloadClients = clients.reload
+  const reloadKpis = kpis.reload
+  useEffect(() => {
+    if (!active) return
+    if (dejaAffichee.current) {
+      reloadClients({ silent: true })
+      reloadKpis({ silent: true })
+    }
+    dejaAffichee.current = true
+  }, [active, reloadClients, reloadKpis])
+
   // Nombre de clients par filtre (pastilles), calculé sur toute la liste
   const counts = useMemo(() => {
     const list = clients.data ?? []
@@ -117,6 +135,19 @@ export function Dashboard() {
     )
 
 
+  /*
+    Ouvre la fiche client (page dédiée), en lui transmettant l'ordre de la liste affichée :
+    il servira aux flèches précédent / suivant (« 2 sur 6 · En retard »).
+  */
+  function openClient(client: ClientView) {
+    navigate(`/clients/${client.slug}`, {
+      liste: {
+        slugs: visibleClients.map((c) => c.slug),
+        libelle: FILTERS.find((f) => f.value === filter)?.label ?? 'Tous',
+      },
+    })
+  }
+
   // « Réessayer » recharge la liste, et les KPI s'ils étaient aussi en erreur
   function handleRetry() {
     clients.reload()
@@ -126,10 +157,7 @@ export function Dashboard() {
   const toastZone = <Toasts toasts={toasts.toasts} onDismiss={toasts.dismiss} />
 
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row">
-      <MobileTopBar />
-      <Sidebar />
-
+    <>
       <main className="flex min-w-0 flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:py-8 xl:px-8">
         {/* En-tête : titre à gauche, temps gagné mis en avant à droite (en dessous sur mobile) */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -186,24 +214,13 @@ export function Dashboard() {
                 clients={visibleClients}
                 now={now}
                 onRelancer={requestRelance}
-                onOpen={(client) => setSelectedId(client.id)}
+                onOpen={openClient}
                 pendingIds={pendingIds}
               />
             )}
           </div>
         </section>
       </main>
-
-      {selectedId && (
-        <ClientPanel
-          clientId={selectedId}
-          now={now}
-          pending={pendingIds.has(selectedId)}
-          onRelancer={requestRelance}
-          onClose={() => setSelectedId(undefined)}
-          toasts={draft ? null : toastZone}
-        />
-      )}
 
       {draft && (
         <MailPreview
@@ -218,8 +235,8 @@ export function Dashboard() {
         />
       )}
 
-      {/* Une seule zone de toasts à la fois : dans l'aperçu ou le panneau s'ils sont ouverts, sinon ici */}
-      {!draft && !selectedId && toastZone}
-    </div>
+      {/* Une seule zone de toasts à la fois : dans l'aperçu s'il est ouvert, sinon ici */}
+      {!draft && toastZone}
+    </>
   )
 }
