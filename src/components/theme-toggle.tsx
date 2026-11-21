@@ -12,14 +12,15 @@ type ThemeToggleProps = {
 }
 
 /*
-  Pastille clair / sombre : 2 boutons côte à côte, celui du thème actif est mis en avant.
+  Pastille clair / sombre : 2 boutons de même largeur qui remplissent le conteneur, celui du thème actif est mis en avant.
+  Contour de focus collé au bouton (offset 0) pour ne pas déborder du conteneur.
   aria-pressed annonce aux lecteurs d'écran lequel est choisi.
 */
 export function ThemeToggle({ compact = false }: ThemeToggleProps) {
   const { theme, setTheme } = useTheme()
 
   return (
-    <div role="group" aria-label="Thème d'affichage" className="inline-flex rounded-sm border border-border bg-surface p-0.5">
+    <div role="group" aria-label="Thème d'affichage" className="flex rounded-sm border border-border bg-surface p-0.5">
       {OPTIONS.map((option) => {
         const active = theme === option.value
         return (
@@ -29,7 +30,7 @@ export function ThemeToggle({ compact = false }: ThemeToggleProps) {
             aria-pressed={active}
             aria-label={compact ? `Thème ${option.label.toLowerCase()}` : undefined}
             onClick={() => setTheme(option.value)}
-            className={`flex h-7 cursor-pointer items-center gap-1.5 rounded-xs px-2 text-caption transition-colors ${
+            className={`flex h-7 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xs px-2 text-caption transition-colors focus-visible:outline-offset-0 ${
               active ? 'bg-accent text-accent-on' : 'text-secondary hover:text-primary'
             }`}
           >

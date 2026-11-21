@@ -9,6 +9,7 @@ import { TimeSaved } from '../components/time-saved'
 import { Toasts } from '../components/toasts'
 import { FILTERS, URGENCE, type StatusFilter } from '../domain/filters'
 import { formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
+import { tauxCompletude } from '../domain/status'
 import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useElementHeight } from '../hooks/use-element-height'
@@ -70,14 +71,22 @@ export function Dashboard() {
   // Recherche sans tenir compte des majuscules ni des accents (« ines » trouve « Inès »)
   const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   const search = normalize(query.trim())
-  // Filtre de statut, recherche, puis tri par urgence (l'ordre de l'API, échéance puis pièces, est gardé à égalité)
+  /*
+    Filtre de statut, recherche, puis tri :
+    - « Tous » : du plus grave au moins grave (retard, attente, relancé, complet) ;
+    - à statut égal, et quand une pastille est choisie : complétude la plus faible en haut (le plus de pièces à récupérer).
+    À égalité, l'ordre de l'API (échéance puis pièces) est gardé.
+  */
   const visibleClients = (clients.data ?? [])
     .filter(
       (c) =>
         (filter === 'tous' || c.statut === filter) &&
         (!search || normalize(c.nom).includes(search) || normalize(c.collaborateur).includes(search)),
     )
-    .sort((a, b) => URGENCE.indexOf(a.statut) - URGENCE.indexOf(b.statut))
+    .sort(
+      (a, b) =>
+        URGENCE.indexOf(a.statut) - URGENCE.indexOf(b.statut) || tauxCompletude(a) - tauxCompletude(b),
+    )
 
 
   // « Réessayer » recharge la liste, et les KPI s'ils étaient aussi en erreur
