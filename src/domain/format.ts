@@ -17,8 +17,9 @@ export function prochaineEcheanceTva(now: Date): Date {
   return now.getDate() <= JOUR_ECHEANCE_TVA ? ceMois : new Date(now.getFullYear(), now.getMonth() + 1, JOUR_ECHEANCE_TVA)
 }
 
+// « 18 novembre », et « 1er novembre » pour le premier du mois (règle typographique française)
 export function formatJourMois(date: Date): string {
-  return jourMois.format(date)
+  return jourMois.format(date).replace(/^1 /, '1er ')
 }
 
 const jourMoisCourt = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' })
