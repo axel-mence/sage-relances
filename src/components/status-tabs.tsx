@@ -3,7 +3,8 @@ import { TABS, type StatusFilter } from '../domain/filters'
 
 type StatusTabsProps = {
   value: StatusFilter
-  counts: Record<StatusFilter, number>
+  // Absent tant que la liste n'est pas chargée : on n'affiche pas de faux « 0 »
+  counts?: Record<StatusFilter, number>
   onChange: (value: StatusFilter) => void
   // id du contenu piloté par les onglets (lien accessible onglet → liste)
   panelId: string
@@ -57,13 +58,15 @@ export function StatusTabs({ value, counts, onChange, panelId }: StatusTabsProps
               }`}
             >
               {tab.label}
-              <span
-                className={`rounded-sm px-1.5 text-caption ${
-                  selected ? 'bg-primary text-white' : 'bg-status-relancee-bg text-secondary'
-                }`}
-              >
-                {counts[tab.value]}
-              </span>
+              {counts && (
+                <span
+                  className={`rounded-sm px-1.5 text-caption ${
+                    selected ? 'bg-primary text-white' : 'bg-status-relancee-bg text-secondary'
+                  }`}
+                >
+                  {counts[tab.value]}
+                </span>
+              )}
             </button>
           )
         })}

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { api } from '../api/clients-api'
 import { ClientTable } from '../components/client-table'
 import { KpiCard } from '../components/kpi-card'
+import { ListEmpty, ListError, ListSkeleton } from '../components/list-states'
 import { MobileTopBar, Sidebar } from '../components/sidebar'
 import { StatusTabs } from '../components/status-tabs'
 import { Toasts } from '../components/toasts'
@@ -63,6 +64,12 @@ export function Dashboard() {
   // Props communes aux 4 cartes : chargement et erreur (spec, section 8)
   const kpiState = { loading: kpis.loading, unavailable: !!kpis.error }
 
+  // « Réessayer » recharge la liste, et les KPI s'ils étaient aussi en erreur
+  function handleRetry() {
+    clients.reload()
+    if (kpis.error) kpis.reload()
+  }
+
   const toastZone = <Toasts toasts={toasts.toasts} onDismiss={toasts.dismiss} />
 
   return (
@@ -108,13 +115,15 @@ export function Dashboard() {
         </section>
 
         <section aria-label="Clients" className="flex flex-col gap-4">
-          <StatusTabs value={filter} counts={counts} onChange={setFilter} panelId="clients-panel" />
+          <StatusTabs value={filter} counts={clients.data ? counts : undefined} onChange={setFilter} panelId="clients-panel" />
           <div id="clients-panel" role="tabpanel" aria-labelledby={`tab-${filter}`}>
-            {/* États de chargement, vide et erreur détaillés à l'étape 8 */}
+            {/* États de la liste : chargement, erreur, vide, puis contenu (spec, section 8) */}
             {clients.loading ? (
-              <p className="text-secondary">Chargement des dossiers…</p>
+              <ListSkeleton />
             ) : clients.error ? (
-              <p className="text-status-retard">Impossible de récupérer les dossiers</p>
+              <ListError onRetry={handleRetry} />
+            ) : visibleClients.length === 0 ? (
+              <ListEmpty onShowAll={filter === 'tous' ? undefined : () => setFilter('tous')} />
             ) : (
               <ClientTable
                 clients={visibleClients}
