@@ -1,74 +1,174 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   DA Nudge (brief : DA/nudge-handoff-claude-code.md)
-   Les couleurs vivent dans des variables CSS --nudge-*, puis Tailwind les expose
-   en classes : --color-lime → bg-lime, text-lime, border-lime…
+   DS Nudge v2 (source : Figma « Sage · Relance pièces · Inspi UI », page « É8 · DS Nudge · v2 »)
+   Remplace le DS temporaire v1. Mêmes noms de tokens que la v1 pour que le code suive sans renommage,
+   plus quelques ajouts (surface-2, inverse, accent-on, brand-*, rayons xs et pill).
 
-   Transition en cours (branche feat/da-nudge) : les tokens du DS v1 plus bas
-   restent actifs tant que les écrans ne sont pas rhabillés. Deux noms du brief
-   existent déjà en v1 avec une autre valeur : « surface » (blanc en v1) et
-   « muted » (gris texte en v1). Ils basculeront sur les valeurs Nudge à l'étape 4,
-   avec le passage du tableau de bord en sombre. En attendant, leurs valeurs Nudge
-   sont disponibles sous --nudge-surface et --nudge-muted.
+   Deux modes :
+   - Clair (par défaut, :root) : mode principal, aussi pour la future page de dépôt côté client
+   - Sombre (classe .theme-dark sur <html>) : au choix de l'utilisateur, via la pastille clair / sombre
+   Les couleurs vivent dans des variables CSS --ds-*, qui changent de valeur selon le mode.
+   Tailwind les expose ensuite en classes : --color-surface → bg-surface, text-…, border-…
    ========================================================================== */
-:root {
-  /* Base */
-  --nudge-ink: #090b0b;
-  --nudge-surface: #131716;
-  --nudge-surface-2: #1c2221;
-  --nudge-mist: #f2f4ee;
-  --nudge-muted: #8a938f;
 
-  /* Accents */
-  --nudge-lime: #d4f53c; /* action principale */
-  --nudge-green: #3de86b; /* succès, pièce reçue */
-  --nudge-teal: #0f3d3e; /* blocs secondaires */
-  --nudge-alert: #ff7a45; /* pièce manquante, à relancer */
+/* Mode clair (par défaut, ou forcé avec .theme-light dans une zone en mode sombre) */
+:root,
+.theme-light {
+  color-scheme: light;
+
+  --ds-page: #fbfcfa;
+  --ds-surface: #ffffff;
+  --ds-surface-2: #f2f4ee;
+  --ds-inverse: #090b0b;
+  --ds-border: #e3eae4;
+
+  --ds-primary: #090b0b;
+  --ds-secondary: #4a5450;
+  /* Écart avec Figma : #7C8581 → #666F6B, car #7C8581 ne passe pas le contraste AA (3,8:1 sur blanc) */
+  --ds-muted: #666f6b;
+  --ds-on-inverse: #f2f4ee;
+
+  --ds-accent: #090b0b;
+  --ds-accent-hover: #1c2221;
+  --ds-accent-on: #d4f53c;
+  --ds-accent-subtle: #f1fad0;
+
+  --ds-status-recue: #1e7a3c;
+  --ds-status-recue-bg: #e3f8e8;
+  --ds-status-attente: #8a5a00;
+  --ds-status-attente-bg: #fff3d6;
+  /* Écart avec Figma : #C2410C → #B83C0B, pour passer le AA sur son fond teinté (4,43 → 4,87:1) */
+  --ds-status-retard: #b83c0b;
+  --ds-status-retard-bg: #ffe9df;
+  --ds-status-relancee: #4a5a00;
+  --ds-status-relancee-bg: #f1fad0;
 }
 
-/*
-  Variante « nudge: » : un style préfixé par nudge: ne s'applique qu'à l'intérieur d'un bloc
-  portant la classe .theme-nudge (fond sombre côté cabinet).
-  Exemple : class="bg-accent-strong nudge:bg-lime" → vert en v1, citron dans le thème Nudge.
-  Permet de rhabiller les composants sans casser les écrans pas encore passés en Nudge (étape 4).
-*/
-@custom-variant nudge (&:where(.theme-nudge, .theme-nudge *));
+/* Mode sombre : côté cabinet */
+.theme-dark {
+  color-scheme: dark;
 
-/* « inline » : Tailwind recopie la variable telle quelle, ce qui permet de pointer vers --nudge-* */
+  --ds-page: #090b0b;
+  --ds-surface: #131716;
+  --ds-surface-2: #1c2221;
+  --ds-inverse: #f2f4ee;
+  --ds-border: #252c2b;
+
+  --ds-primary: #f2f4ee;
+  --ds-secondary: #b4bcb8;
+  --ds-muted: #8a938f;
+  --ds-on-inverse: #090b0b;
+
+  --ds-accent: #d4f53c;
+  --ds-accent-hover: #c2e62a;
+  --ds-accent-on: #090b0b;
+  --ds-accent-subtle: #2a3312;
+
+  --ds-status-recue: #3de86b;
+  --ds-status-recue-bg: #133a22;
+  --ds-status-attente: #f5c451;
+  --ds-status-attente-bg: #3a2e12;
+  --ds-status-retard: #ff7a45;
+  --ds-status-retard-bg: #3d1e12;
+  --ds-status-relancee: #d4f53c;
+  --ds-status-relancee-bg: #2a3312;
+}
+
+/* Variante « dark: » de Tailwind branchée sur la classe .theme-dark (au lieu du réglage du système) */
+@custom-variant dark (&:where(.theme-dark, .theme-dark *));
+
+/* « inline » : Tailwind recopie la variable telle quelle, la classe suit donc le mode actif */
 @theme inline {
-  /* Alias temporaires des 2 noms déjà pris en v1 (voir plus haut), retirés à l'étape 4 */
-  --color-nudge-surface: var(--nudge-surface);
-  --color-nudge-muted: var(--nudge-muted);
+  /* Fonds et bordures */
+  --color-page: var(--ds-page);
+  --color-surface: var(--ds-surface);
+  --color-surface-2: var(--ds-surface-2);
+  --color-inverse: var(--ds-inverse);
+  --color-border: var(--ds-border);
 
-  --color-ink: var(--nudge-ink);
-  --color-surface-2: var(--nudge-surface-2);
-  --color-mist: var(--nudge-mist);
-  --color-lime: var(--nudge-lime);
-  --color-green: var(--nudge-green);
-  --color-teal: var(--nudge-teal);
-  --color-alert: var(--nudge-alert);
+  /* Texte */
+  --color-primary: var(--ds-primary);
+  --color-secondary: var(--ds-secondary);
+  --color-muted: var(--ds-muted);
+  --color-on-inverse: var(--ds-on-inverse);
+
+  /* Accent : noir sur clair, citron sur sombre ; accent-on = couleur du texte posé sur l'accent */
+  --color-accent: var(--ds-accent);
+  --color-accent-hover: var(--ds-accent-hover);
+  --color-accent-on: var(--ds-accent-on);
+  --color-accent-subtle: var(--ds-accent-subtle);
+
+  /* Statuts (texte / fond) */
+  --color-status-recue: var(--ds-status-recue);
+  --color-status-recue-bg: var(--ds-status-recue-bg);
+  --color-status-attente: var(--ds-status-attente);
+  --color-status-attente-bg: var(--ds-status-attente-bg);
+  --color-status-retard: var(--ds-status-retard);
+  --color-status-retard-bg: var(--ds-status-retard-bg);
+  --color-status-relancee: var(--ds-status-relancee);
+  --color-status-relancee-bg: var(--ds-status-relancee-bg);
 }
 
 @theme {
-  /* Typo Nudge : Sora pour les titres, chiffres clés et le logo (chargée dans index.html) */
-  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
-  /* Interlettrage des titres Sora (brief : -0.03em à -0.05em) et des labels de section en majuscules */
-  --tracking-display: -0.04em;
-  --tracking-label: 0.1em;
-  /* Chiffre clé (brief : 96 px) ramené à 48 px sur mobile et 64 px sur grand écran */
-  --text-figure: 48px;
-  --text-figure--line-height: 1;
-  --text-figure-lg: 64px;
-  --text-figure-lg--line-height: 1;
+  /* Couleurs de marque, identiques dans les 2 modes */
+  --color-brand-lime: #d4f53c;
+  --color-brand-green: #3de86b;
+  --color-brand-teal: #0f3d3e;
 
-  /* Rayons Nudge : cartes, tuiles, bouton principal (arrondi complet) */
-  --radius-card: 24px;
-  --radius-tile: 16px;
+  /* Typo : Sora pour les titres et chiffres, Inter pour l'interface (chargées dans index.html) */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+
+  /* Styles de texte du DS (taille, interlignage, graisse, interlettrage). Les titres s'utilisent avec font-display. */
+  --text-display: 56px; /* Display · Sora SemiBold 56/62 */
+  --text-display--line-height: 62px;
+  --text-display--font-weight: 600;
+  --text-display--letter-spacing: -0.03em;
+  --text-title: 32px; /* Titre page · Sora SemiBold 32/40 */
+  --text-title--line-height: 40px;
+  --text-title--font-weight: 600;
+  --text-title--letter-spacing: -0.03em;
+  --text-section: 22px; /* Titre section · Sora SemiBold 22/30 */
+  --text-section--line-height: 30px;
+  --text-section--font-weight: 600;
+  --text-section--letter-spacing: -0.02em;
+  --text-kpi: 48px; /* Chiffre KPI · Sora Bold 48/52, interlettrage -5 % */
+  --text-kpi--line-height: 52px;
+  --text-kpi--font-weight: 700;
+  --text-kpi--letter-spacing: -0.05em;
+  --text-body-lg: 16px; /* Corps · Inter Regular 16/24 */
+  --text-body-lg--line-height: 24px;
+  --text-body: 14px; /* Corps small · Inter Regular 14/20 (texte d'interface par défaut) */
+  --text-body--line-height: 20px;
+  --text-label: 14px; /* Libellé · Inter Medium 14/20 */
+  --text-label--line-height: 20px;
+  --text-label--font-weight: 500;
+  --text-button: 15px; /* Bouton · Inter SemiBold 15/20 */
+  --text-button--line-height: 20px;
+  --text-button--font-weight: 600;
+  --text-overline: 12px; /* Label section · Inter Medium 12/16, en majuscules */
+  --text-overline--line-height: 16px;
+  --text-overline--font-weight: 500;
+  --text-overline--letter-spacing: 0.1em;
+  --text-caption: 12px; /* Légende · Inter Regular 12/16 */
+  --text-caption--line-height: 16px;
+
+  /*
+    Espacements : base Tailwind de 4 px, les classes collent à l'échelle du DS
+    p-1 = 4, p-2 = 8, p-3 = 12, p-4 = 16, p-6 = 24, p-8 = 32, p-12 = 48, p-16 = 64.
+  */
+  --spacing: 4px;
+
+  /* Rayons du DS v2 */
+  --radius-xs: 6px; /* badges */
+  --radius-sm: 8px; /* boutons, lignes de pièce, pastilles */
+  --radius-md: 16px; /* cartes, lignes client */
+  --radius-lg: 24px; /* grandes cartes */
   --radius-pill: 999px;
 }
 
-/* Fond sombre (hero, barre latérale, connexion côté cabinet) : noir profond + halo vert émeraude */
+/* Fond sombre en dégradé (hero, barre latérale, connexion côté cabinet) : noir profond + halo vert émeraude */
 @utility bg-nudge-dark {
   background:
     radial-gradient(35% 45% at 100% 35%, rgba(61, 232, 107, 0.12), transparent 100%),
@@ -77,7 +177,7 @@
     #050807;
 }
 
-/* Fond clair (page de dépôt côté client, mobile) */
+/* Fond clair en dégradé (page de dépôt côté client, mobile) */
 @utility bg-nudge-light {
   background:
     radial-gradient(35% 45% at 100% 35%, rgba(61, 232, 107, 0.08), transparent 100%),
@@ -86,81 +186,7 @@
     #fbfcfa;
 }
 
-/* ==========================================================================
-   DS v1 / v2 (avant Nudge) : remplacé progressivement aux étapes 3 et 4
-   ========================================================================== */
-
-/*
-  Design system temporaire v1 (source : Figma, page « DS temporaire (v1) »).
-  Chaque token devient une classe Tailwind : --color-accent → bg-accent, text-accent, border-accent…
-
-  Ajustements d'accessibilité par rapport au v1 Figma (contraste AA = 4,5:1 minimum pour le texte) :
-  - accent-strong (#2F7A1F) et accent-strong-hover : ajoutés pour le texte vert et le bouton primaire,
-    car le blanc sur #56A538 ne donne que 3,07:1. #56A538 reste pour les fonds et éléments décoratifs.
-  - text-muted : #9A9A95 → #76766F (2,83:1 → 4,57:1 sur blanc).
-  - status-attente : #B26B00 → #9A5C00 (3,83:1 → 4,9:1 sur son fond).
-  À valider (ou corriger) à l'étape 9, DS v2.
-*/
-@theme {
-  /* Couleurs : fonds et bordures */
-  --color-page: #f7f7f7;
-  --color-surface: #ffffff;
-  --color-border: #e5e5e5;
-
-  /* Couleurs : texte */
-  --color-primary: #111111;
-  --color-secondary: #6b6b67;
-  --color-muted: #76766f;
-
-  /* Couleurs : accent vert */
-  --color-accent: #56a538;
-  --color-accent-hover: #3f8a2a;
-  --color-accent-subtle: #eef6ea;
-  --color-accent-strong: #2f7a1f;
-  --color-accent-strong-hover: #24631a;
-
-  /* Couleurs : statuts (texte / fond) */
-  --color-status-attente: #9a5c00;
-  --color-status-attente-bg: #fff3dd;
-  --color-status-retard: #c2382d;
-  --color-status-retard-bg: #fdecea;
-  --color-status-relancee: #111111;
-  --color-status-relancee-bg: #ededed;
-
-  /* Typo : Inter, chargée dans index.html */
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-
-  /* Tailles de texte du DS (taille, interlignage, graisse) */
-  --text-kpi: 28px;
-  --text-kpi--line-height: 36px;
-  --text-kpi--font-weight: 600;
-  --text-title: 24px;
-  --text-title--line-height: 32px;
-  --text-title--font-weight: 600;
-  --text-section: 18px;
-  --text-section--line-height: 26px;
-  --text-section--font-weight: 600;
-  --text-body: 14px;
-  --text-body--line-height: 20px;
-  --text-label: 13px;
-  --text-label--line-height: 18px;
-  --text-label--font-weight: 500;
-  --text-caption: 12px;
-  --text-caption--line-height: 16px;
-
-  /*
-    Espacements : base Tailwind de 4 px, donc les classes collent à l'échelle du DS
-    p-1 = 4, p-2 = 8, p-3 = 12, p-4 = 16, p-6 = 24, p-8 = 32, p-12 = 48.
-  */
-  --spacing: 4px;
-
-  /* Rayons du DS */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-}
-
-/* DS v2 · Chiffres tabulaires (largeur fixe) dans les tableaux : les colonnes de nombres et de dates restent alignées */
+/* Chiffres tabulaires (largeur fixe) dans les tableaux : les colonnes de nombres et de dates restent alignées */
 table {
   font-variant-numeric: tabular-nums;
 }
@@ -170,7 +196,7 @@ body {
   @apply bg-page text-body text-primary font-sans antialiased;
 }
 
-/* Focus visible au clavier, commun à tous les éléments interactifs */
+/* Focus visible au clavier, commun à tous les éléments interactifs (noir en clair, citron en sombre) */
 :focus-visible {
-  @apply outline-2 outline-offset-2 outline-accent-strong;
+  @apply outline-2 outline-offset-2 outline-accent;
 }

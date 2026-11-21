@@ -1,20 +1,22 @@
+import { Card } from './card'
+
 type KeyFigureProps = {
-  value: string
   label: string
+  value: string
+  // Précision sous le chiffre, ex. « sur 180 dossiers »
+  context?: string
 }
 
 /*
-  Chiffre clé Nudge (brief, section 4) : Sora 700 en très grand, clair sur fond vert sapin (teal).
-  Taille réduite à 64 px sur grand écran (au lieu des 96 px du brief, validé avec Axel)
-  pour ne pas écraser la liste, et 48 px sur mobile.
+  Carte KPI du DS Nudge v2 (composant Figma « Carte KPI ») :
+  libellé Inter Medium 14 gris, chiffre Sora Bold 48/52 (interlettrage -5 %), légende Inter 12 gris clair.
 */
-export function KeyFigure({ value, label }: KeyFigureProps) {
+export function KeyFigure({ label, value, context }: KeyFigureProps) {
   return (
-    <div className="flex flex-col gap-1 rounded-card bg-teal px-6 py-5 text-mist sm:px-8 sm:py-6">
-      <span className="font-display text-figure font-bold tracking-display tabular-nums lg:text-figure-lg">
-        {value}
-      </span>
-      <span className="text-label text-mist/80">{label}</span>
-    </div>
+    <Card className="flex flex-col gap-1">
+      <span className="text-label text-secondary">{label}</span>
+      <span className="font-display text-kpi text-primary tabular-nums">{value}</span>
+      {context && <span className="text-caption text-muted">{context}</span>}
+    </Card>
   )
 }

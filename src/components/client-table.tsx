@@ -83,7 +83,6 @@ function Actions({ client, pending, onRelancer, onOpen }: ActionsProps) {
       </Button>
       <Button
         size="sm"
-        variant="secondary"
         disabled={client.nbManquantes === 0}
         loading={pending}
         aria-label={`Relancer ${client.nom}`}
@@ -99,13 +98,37 @@ function Actions({ client, pending, onRelancer, onOpen }: ActionsProps) {
 }
 
 /*
-  Densité de la liste (DS v2, étape 4 du MD) :
-  lignes de 44 px (bouton de 32 px + 2 × 6 px), marges horizontales de 16 px à partir de 1280 px
-  (10 px entre 1024 et 1280 px pour que le tableau tienne), séparateurs de 1 px.
+  Lignes au format « Ligne client » du DS Nudge v2 : chaque client est une carte (fond surface, filet,
+  angles de 16 px, 24 px de marge sur les côtés, 16 px en haut et en bas), séparée de la suivante par 8 px.
+  On garde un vrai tableau pour que les colonnes restent alignées d'une ligne à l'autre :
+  le fond et le filet sont posés sur chaque cellule, et les angles arrondis sur la première et la dernière.
 */
-const CELL = 'h-11 px-2.5 py-1.5 xl:px-4'
+// Marges du DS (24 px aux bords, 12 px entre colonnes) à partir de 1280 px ; resserrées entre 1024 et 1280 px
+const CELL = [
+  'border-y border-border bg-surface px-2 py-4 transition-colors group-hover:bg-surface-2 xl:px-3',
+  'first:rounded-l-md first:border-l first:pl-4 last:rounded-r-md last:border-r last:pr-4 xl:first:pl-6 xl:last:pr-6',
+].join(' ')
 // Dates et nombres alignés à droite (chiffres tabulaires hérités du tableau)
 const NUM = `${CELL} text-right`
+// Titres de colonnes : simple légende au-dessus des cartes, alignée sur leurs marges
+const HEAD = 'px-2 pt-1 font-normal first:pl-4 last:pr-4 xl:px-3 xl:first:pl-6 xl:last:pr-6'
+
+// Ligne de titres de colonnes, répétée sous chaque groupe déplié (autorisée sur 2 lignes entre 1024 et 1280 px)
+function ColumnHeaders() {
+  return (
+    <tr className="text-caption text-muted lg:whitespace-normal xl:whitespace-nowrap">
+      <th scope="col" className={HEAD}>Client</th>
+      <th scope="col" className={`${HEAD} text-right`}>Complétude</th>
+      <th scope="col" className={`${HEAD} hidden 2xl:table-cell`}>Collaborateur</th>
+      <th scope="col" className={HEAD}>Pièces manquantes</th>
+      <th scope="col" className={`${HEAD} text-right`}>Échéance</th>
+      <th scope="col" className={`${HEAD} text-right`}>Dernière relance</th>
+      <th scope="col" className={HEAD}>
+        <span className="sr-only">Actions</span>
+      </th>
+    </tr>
+  )
+}
 
 export function ClientTable({ clients, now, searching, openGroups, onToggleGroup, onRelancer, onOpen, pendingIds }: ClientTableProps) {
   // Clients rangés par groupe, dans l'ordre des groupes (le tri de l'API est conservé dans chaque groupe)
@@ -117,30 +140,15 @@ export function ClientTable({ clients, now, searching, openGroups, onToggleGroup
   return (
     <>
       {/* Grand écran : un seul tableau, découpé en groupes, pour garder les colonnes alignées */}
-      <div className="hidden overflow-x-auto rounded-lg border border-border bg-surface lg:block">
-        <table className="w-full text-left whitespace-nowrap">
-          {/* Titres de colonnes autorisés sur 2 lignes entre 1024 et 1280 px pour gagner de la place */}
-          <thead className="border-b border-border text-caption text-secondary lg:whitespace-normal xl:whitespace-nowrap">
-            <tr>
-              <th scope="col" className={`${CELL} font-medium`}>Client</th>
-              <th scope="col" className={`${NUM} font-medium`}>Complétude</th>
-              <th scope="col" className={`${CELL} hidden font-medium 2xl:table-cell`}>Collaborateur</th>
-              <th scope="col" className={`${CELL} font-medium`}>Pièces manquantes</th>
-              <th scope="col" className={`${NUM} font-medium`}>Échéance</th>
-              <th scope="col" className={`${NUM} font-medium`}>Dernière relance</th>
-              <th scope="col" className={`${CELL} font-medium`}>
-                <span className="sr-only">Actions</span>
-              </th>
-            </tr>
-          </thead>
-
+      <div className="hidden overflow-x-auto lg:block">
+        <table className="w-full border-separate border-spacing-y-2 text-left whitespace-nowrap">
           {groups.map((group) => {
             const open = isOpen(group.status)
             return (
               // Un <tbody> par groupe : en-tête de groupe puis ses lignes
               <tbody key={group.status} id={groupId(group.status)} className="scroll-mt-4">
-                <tr className="border-b border-border">
-                  <th colSpan={7} scope="colgroup" className="p-0 font-normal">
+                <tr>
+                  <th colSpan={7} scope="colgroup" className="px-0 pt-4 font-normal">
                     <StatusGroupHeader
                       status={group.status}
                       label={group.label}
@@ -152,30 +160,31 @@ export function ClientTable({ clients, now, searching, openGroups, onToggleGroup
                   </th>
                 </tr>
 
+                {/* Titres de colonnes : seulement sous un groupe déplié qui contient des clients */}
+                {open && group.clients.length > 0 && <ColumnHeaders />}
+
                 {open && group.clients.length === 0 && (
-                  <tr className="border-b border-border">
-                    <td colSpan={7} className="h-11 px-4 text-secondary">Aucun client dans ce groupe</td>
+                  <tr>
+                    <td colSpan={7} className="rounded-md border border-dashed border-border px-6 py-4 text-secondary">
+                      Aucun client dans ce groupe
+                    </td>
                   </tr>
                 )}
 
                 {open &&
                   group.clients.map((client) => (
-                    <tr
-                      key={client.id}
-                      onClick={() => onOpen(client)}
-                      className="cursor-pointer border-b border-border hover:bg-page"
-                    >
+                    <tr key={client.id} onClick={() => onOpen(client)} className="group cursor-pointer">
                       <th scope="row" className={`${CELL} text-left font-normal`}>
-                        {/* Hiérarchie : nom en 14 Medium noir, le reste en 14 Regular gris */}
-                        <span className="block font-medium text-primary">{client.nom}</span>
+                        {/* Hiérarchie : nom en Libellé (Inter Medium 14), le reste en Corps small gris */}
+                        <span className="block text-label text-primary">{client.nom}</span>
                         {/* Collaborateur sous le nom quand la colonne dédiée est masquée */}
-                        <span className="block text-caption text-secondary 2xl:hidden">{client.collaborateur}</span>
+                        <span className="block text-caption text-muted 2xl:hidden">{client.collaborateur}</span>
                       </th>
                       <td className={NUM}><Completude value={tauxCompletude(client)} /></td>
                       <td className={`${CELL} hidden text-secondary 2xl:table-cell`}>{client.collaborateur}</td>
                       <td className={CELL}><PiecesManquantes client={client} /></td>
                       <td className={NUM}><Echeance client={client} now={now} /></td>
-                      <td className={`${NUM} text-secondary`}>{formatRelatif(client.derniereRelance, now)}</td>
+                      <td className={`${NUM} text-muted`}>{formatRelatif(client.derniereRelance, now)}</td>
                       <td className={CELL}>
                         <Actions client={client} pending={pendingIds.has(client.id)} onRelancer={onRelancer} onOpen={onOpen} />
                       </td>
@@ -188,11 +197,11 @@ export function ClientTable({ clients, now, searching, openGroups, onToggleGroup
       </div>
 
       {/* Mobile et tablette : les mêmes groupes, avec une carte par client */}
-      <div className="flex flex-col gap-4 lg:hidden">
+      <div className="flex flex-col gap-6 lg:hidden">
         {groups.map((group) => {
           const open = isOpen(group.status)
           return (
-            <section key={group.status} id={`${groupId(group.status)}-mobile`} className="scroll-mt-4 overflow-hidden rounded-lg border border-border bg-surface">
+            <section key={group.status} id={`${groupId(group.status)}-mobile`} className="flex scroll-mt-4 flex-col gap-2">
               <StatusGroupHeader
                 status={group.status}
                 label={group.label}
@@ -202,19 +211,25 @@ export function ClientTable({ clients, now, searching, openGroups, onToggleGroup
                 controlsId={`${groupId(group.status)}-mobile-liste`}
               />
               {open && (
-                <ul id={`${groupId(group.status)}-mobile-liste`} className="flex flex-col divide-y divide-border">
-                  {group.clients.length === 0 && <li className="px-4 py-3 text-secondary">Aucun client dans ce groupe</li>}
+                <ul id={`${groupId(group.status)}-mobile-liste`} className="flex flex-col gap-2">
+                  {group.clients.length === 0 && (
+                    <li className="rounded-md border border-dashed border-border px-4 py-3 text-secondary">Aucun client dans ce groupe</li>
+                  )}
                   {group.clients.map((client) => (
-                    <li key={client.id} onClick={() => onOpen(client)} className="flex cursor-pointer flex-col gap-3 p-4">
+                    <li
+                      key={client.id}
+                      onClick={() => onOpen(client)}
+                      className="flex cursor-pointer flex-col gap-3 rounded-md border border-border bg-surface p-4"
+                    >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex flex-col">
-                          <span className="font-medium text-primary">{client.nom}</span>
-                          <span className="text-caption text-secondary">{client.collaborateur}</span>
+                          <span className="text-label text-primary">{client.nom}</span>
+                          <span className="text-caption text-muted">{client.collaborateur}</span>
                         </div>
                         <Completude value={tauxCompletude(client)} />
                       </div>
                       <PiecesManquantes client={client} />
-                      <div className="flex flex-wrap items-center justify-between gap-3 text-caption text-secondary">
+                      <div className="flex flex-wrap items-center justify-between gap-3 text-caption text-muted">
                         <span>
                           Échéance <Echeance client={client} now={now} /> · Relance : {formatRelatif(client.derniereRelance, now)}
                         </span>

@@ -1,9 +1,10 @@
 import type { HTMLAttributes } from 'react'
 
 /*
-  Label de section Nudge (brief, section 3) : Inter 500, MAJUSCULES, interlettrage 0.1em, citron.
-  Les majuscules viennent du CSS : le texte reste écrit normalement dans le code (meilleur pour les lecteurs d'écran).
+  Label de section du DS Nudge v2 : Inter Medium 12/16, MAJUSCULES, interlettrage 0.1em,
+  couleur accent (citron en sombre, comme le demande le brief ; noir en clair).
+  Les majuscules viennent du CSS : le texte reste écrit normalement (meilleur pour les lecteurs d'écran).
 */
 export function SectionLabel({ className = '', ...rest }: HTMLAttributes<HTMLSpanElement>) {
-  return <span className={`text-caption font-medium tracking-label text-lime uppercase ${className}`} {...rest} />
+  return <span className={`text-overline text-accent uppercase ${className}`} {...rest} />
 }

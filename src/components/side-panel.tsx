@@ -52,7 +52,7 @@ export function SidePanel({ labelledBy, onClose, children }: SidePanelProps) {
       onClose={onClose}
       // Un clic sur le fond assombri touche le <dialog> lui-même, pas son contenu : on ferme
       onClick={(event) => event.target === event.currentTarget && close()}
-      className="m-0 ml-auto h-dvh max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-black/30 sm:w-110"
+      className="m-0 ml-auto h-dvh max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-black/60 sm:w-110"
     >
       <div ref={contentRef} tabIndex={-1} className="flex h-full flex-col border-l border-border bg-surface outline-none">
         {children(close)}

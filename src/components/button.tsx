@@ -8,26 +8,21 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 /*
-  Chaque variante porte 2 looks : DS v1 (par défaut) et Nudge (préfixe nudge:, actif dans .theme-nudge).
-  Nudge (brief, section 4) :
-  - principal : fond citron, texte noir, Inter 600, arrondi complet (le seul bouton en « pill »)
-  - secondaire : fond sombre surface-2, filet blanc discret, angles de 8 px comme les chips
+  Bouton du DS Nudge v2 (composant Figma « Bouton ») :
+  - principal : fond accent (noir en clair, citron en sombre), texte accent-on, Inter SemiBold 15
+  - secondaire : filet border, texte principal, fond transparent
+  Angles de 8 px (radius sm) pour les 2.
 */
 const VARIANTS = {
-  primary: [
-    'rounded-md bg-accent-strong text-white hover:bg-accent-strong-hover',
-    'nudge:rounded-pill nudge:bg-lime nudge:text-ink nudge:font-semibold nudge:hover:bg-mist',
-  ].join(' '),
-  secondary: [
-    'rounded-md bg-surface text-primary border border-border hover:bg-page',
-    'nudge:bg-surface-2 nudge:text-mist nudge:border-white/10 nudge:hover:border-white/40 nudge:hover:bg-surface-2',
-  ].join(' '),
+  primary: 'bg-accent text-accent-on hover:bg-accent-hover',
+  secondary: 'border border-border text-primary hover:bg-surface-2',
 }
 
 const SIZES = {
+  // Version compacte pour les lignes de la liste
   sm: 'h-8 px-3 text-label',
-  // Bouton principal Nudge : 16 px × 28 px de marge intérieure (brief)
-  md: 'h-10 px-4 text-label nudge:h-auto nudge:px-7 nudge:py-4 nudge:text-body',
+  // Taille du DS : 24 px × 12 px de marge intérieure
+  md: 'px-6 py-3 text-button',
 }
 
 export function Button({
@@ -47,7 +42,7 @@ export function Button({
       type={type}
       disabled={isDisabled}
       aria-busy={loading || undefined}
-      className={`inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={`inline-flex cursor-pointer items-center justify-center gap-2 rounded-sm whitespace-nowrap transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
       {...rest}
     >
       {loading && (
