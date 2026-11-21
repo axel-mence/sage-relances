@@ -3,6 +3,8 @@
   Tracés en currentColor : ils prennent la couleur du texte du lien (DS Nudge, clair ou sombre).
 */
 const PATHS = {
+  // Maison : tableau de bord
+  home: 'M3.5 10.5 12 3.5l8.5 7V20a.5.5 0 0 1-.5.5h-5v-6h-6v6H4a.5.5 0 0 1-.5-.5Z',
   // Deux silhouettes : clients
   clients:
     'M9 11.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.4c2 .8 3.5 2.6 3.5 5.6',

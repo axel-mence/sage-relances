@@ -16,6 +16,8 @@ export type ListeOrigine = {
 
 export type HistoryState = {
   scrollY?: number
+  // Page d'où l'on a ouvert une fiche : le lien retour y ramène (« ‹ Tableau de bord », « ‹ Clients »)
+  depuis?: { path: string; libelle: string }
   liste?: ListeOrigine
 }
 
@@ -55,11 +57,21 @@ export function clientSlugFromPath(path: string): string | undefined {
 }
 
 /*
-  Retour à la liste. Si on vient de la liste, on recule dans l'historique : le navigateur
-  retrouve alors l'entrée de la liste avec sa position de défilement.
-  Si la fiche a été ouverte depuis un lien partagé, il n'y a pas de liste derrière : on y va.
+  Retour depuis une fiche. Si on vient d'une page de l'app, on recule dans l'historique : le navigateur
+  retrouve alors cette page avec sa position de défilement.
+  Si la fiche a été ouverte depuis un lien partagé, il n'y a rien derrière : on va à l'annuaire des clients.
 */
-export function backToList() {
-  if (historyState().liste) window.history.back()
-  else navigate('/')
+export function backFromClient() {
+  if (historyState().depuis) window.history.back()
+  else navigate('/clients')
+}
+
+// Libellé du lien retour de la fiche : la page d'où l'on vient, sinon l'annuaire
+export function backLabel(): string {
+  return historyState().depuis?.libelle ?? 'Clients'
+}
+
+// « /clients » : l'annuaire des clients
+export function isClientsPath(path: string): boolean {
+  return /^\/clients\/?$/.test(path)
 }

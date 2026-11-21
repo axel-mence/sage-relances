@@ -1,13 +1,15 @@
 type SearchFieldProps = {
   value: string
   onChange: (value: string) => void
+  // Id unique du champ : la liste et l'annuaire ont chacun le leur (les 2 pages restent montées)
+  id?: string
 }
 
 // Barre de recherche de la liste : filtre par nom de client ou de collaborateur
-export function SearchField({ value, onChange }: SearchFieldProps) {
+export function SearchField({ value, onChange, id = 'recherche-client' }: SearchFieldProps) {
   return (
     <div className="relative w-full sm:max-w-sm lg:max-w-xs">
-      <label htmlFor="recherche-client" className="sr-only">
+      <label htmlFor={id} className="sr-only">
         Rechercher un client ou un collaborateur
       </label>
       {/* Loupe décorative */}
@@ -20,7 +22,7 @@ export function SearchField({ value, onChange }: SearchFieldProps) {
         <path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
       <input
-        id="recherche-client"
+        id={id}
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}

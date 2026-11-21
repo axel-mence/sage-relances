@@ -1,6 +1,7 @@
 # Spec · Nudge · Clients et Relances
 
-> Version 1 · 21/11/2026 · Auteur : Axel Mencé
+> Version 1.1 · 21/11/2026 · Auteur : Axel Mencé
+> 1.1 : le panneau latéral reste sur le tableau de bord, la page client devient une page à part (annuaire « Clients »). Décision d'Axel après l'étape 4.
 > Complète [spec.md](spec.md) (tableau de bord, règle de statut, DS). En cas de doute sur ces 2 features, ce fichier fait foi.
 > Références retenues : [refs-clients-relances/CONTEXTE.md](refs-clients-relances/CONTEXTE.md).
 > Cas fictif : cabinet, clients, contacts et chiffres inventés. Aucun mail réel n'est envoyé.
@@ -19,22 +20,24 @@ Aujourd'hui, la fiche client est un panneau latéral de 440 px. Il suffit pour r
 
 | # | Question | Décision | Note d'Axel appliquée |
 |---|---|---|---|
-| 1 | Où vit la fiche ? | **Page dédiée** en 2 colonnes. Le panneau latéral disparaît. | Attio « top » : activité à gauche, détails à droite |
+| 1 | Où vit la fiche ? | **Page dédiée** en 2 colonnes, **à part du tableau de bord**. Le panneau latéral reste l'aperçu rapide du tableau de bord, avec un bouton « Détail » vers la page (révision 1.1). | Attio « top » : activité à gauche, détails à droite |
 | 2 | Que montre la colonne de gauche ? | **2 onglets** : « Activité » (tous les événements) et « Mails envoyés (n) » avec « Voir le mail » | Shopify « top pour historique » : timeline datée, groupée par jour |
 | 3 | En-tête et colonne de droite ? | **Version simple** : pièces de la période, contact, entreprise, dernière relance | Dub « Parfait pour client » : blocs sobres et empilés |
-| 4 | Navigation ? | **Adresse propre**, retour à la liste avec l'état conservé, entrée « Clients » active, **précédent / suivant** dans la liste filtrée | Attio : flèches ↑ ↓ « 3 sur 6 » |
+| 4 | Navigation ? | **Adresse propre**, entrée « Clients » vers un **annuaire** (révision 1.1), retour avec l'état conservé, **précédent / suivant** dans la liste d'origine | Attio : Companies → fiche, flèches ↑ ↓ « 3 sur 6 » |
 | 5 | États et cas limites ? | Validés tels que listés en section 6 | |
 | 6 | Données et hors périmètre ? | Validés tels que listés en sections 7 et 9 | |
 
 ### 3. Parcours
 
-1. Le collaborateur filtre la liste (par exemple « En retard ») et clique sur une ligne, ou sur « Voir ».
-2. La fiche s'ouvre en pleine page, à l'adresse `/clients/garage-peyrot`. Le focus est placé sur le nom du client.
+1. Deux chemins mènent à la page client :
+   - **Tableau de bord** : le collaborateur clique sur une ligne (ou « Voir ») ; le panneau s'ouvre à droite pour un aperçu rapide. Le bouton **« Détail »** ouvre la page client.
+   - **Barre latérale → Clients** : l'annuaire liste tous les clients par ordre alphabétique, avec une recherche. Un clic ouvre la page client.
+2. La page client s'ouvre à l'adresse `/clients/garage-peyrot`. Le focus est placé sur le nom du client.
 3. Il lit l'état du dossier dans la colonne de droite (complétude, pièces manquantes, dernière relance) et l'historique à gauche.
 4. Il clique sur « Relancer (2 pièces) » : l'aperçu du mail s'ouvre (PR #7). S'il a déjà relancé aujourd'hui, l'aperçu le lui signale en tête.
 5. Il envoie : un toast confirme, l'événement apparaît en tête de l'activité, « Dernière relance » passe à « À l'instant ».
 6. Il passe au client suivant avec la flèche ↓ (« 2 sur 6 · En retard »), sans revenir à la liste.
-7. Il revient à la liste (« ‹ Clients » ou retour du navigateur) : il retrouve son filtre, sa recherche et sa position.
+7. Il revient d'où il vient (« ‹ Tableau de bord » ou « ‹ Clients », ou retour du navigateur) : il retrouve son filtre, sa recherche et sa position.
 
 ### 4. Écran · Fiche client
 
@@ -78,10 +81,11 @@ Une seule colonne : en-tête (actions sur une ligne pleine largeur), puis les bl
 
 ### 5. Navigation
 
-- Adresses : `/` pour la liste, `/clients/:slug` pour la fiche (slug tiré du nom : `garage-peyrot`). Sans bibliothèque de routage : on utilise l'historique du navigateur (History API).
-- Barre latérale : l'entrée « Tableau de bord » devient **« Clients »** et reste active sur la liste comme sur la fiche.
-- Retour à la liste : filtre, recherche et position de défilement conservés.
-- Précédent / suivant : suivent l'ordre de la liste au moment du clic (filtre, recherche et tri par gravité). Fiche ouverte depuis un lien partagé : on parcourt tous les clients dans l'ordre de gravité.
+- Adresses : `/` pour le tableau de bord, `/clients` pour l'annuaire, `/clients/:slug` pour la page client (slug tiré du nom : `garage-peyrot`). Sans bibliothèque de routage : on utilise l'historique du navigateur (History API).
+- Barre latérale : **« Tableau de bord »** et **« Clients »** (active sur l'annuaire et sur les pages clients). Sur mobile, les 2 pages sont en onglets sous la barre du haut.
+- **Annuaire** : table simple (client, contact, collaborateur, statut, complétude), tri alphabétique, recherche par client, contact ou collaborateur. Cartes sur mobile.
+- Retour : vers la page d'origine (« ‹ Tableau de bord » ou « ‹ Clients »), avec filtre, recherche et position de défilement conservés. Lien partagé : retour vers l'annuaire.
+- Précédent / suivant : suivent l'ordre de la page d'origine au moment du clic (liste filtrée du tableau de bord, ou annuaire). Fiche ouverte depuis un lien partagé : on parcourt tous les clients dans l'ordre de gravité.
 - Raccourcis clavier : `J` / `K` pour suivant / précédent (comme Attio), `Échap` ne fait rien sur la page (il ferme seulement l'aperçu du mail).
 
 ### 6. États et cas limites
@@ -152,7 +156,8 @@ Réutilisation : Button, StatusBadge, Completude, Avatar, NavIcon, toasts, squel
 
 ### 10. Critères d'acceptation
 
-- [ ] Un clic sur une ligne (ou sur « Voir ») ouvre la fiche à l'adresse `/clients/:slug`. Le retour du navigateur ramène à la liste.
+- [ ] Tableau de bord : un clic sur une ligne (ou « Voir ») ouvre le panneau à droite ; « Détail » ouvre la page `/clients/:slug`.
+- [ ] « Clients » (barre latérale) ouvre l'annuaire ; un clic sur un client ouvre sa page. Le retour du navigateur ramène à la page d'origine.
 - [ ] Au retour, le filtre, la recherche et la position de défilement sont conservés.
 - [ ] Précédent / suivant parcourent la liste filtrée et affichent « n sur N · filtre ». Les flèches sont désactivées aux extrémités.
 - [ ] L'onglet Activité liste l'ouverture du dossier, les pièces reçues et les relances, groupées par jour, de la plus récente à la plus ancienne.
@@ -167,11 +172,11 @@ Réutilisation : Button, StatusBadge, Completude, Avatar, NavIcon, toasts, squel
 ### 11. Étapes de construction (proposées, à valider après les wireframes)
 
 1. Données : `clientDepuis`, contenu des relances, activité calculée + tests.
-2. Navigation : adresses, retour avec état conservé, entrée « Clients ».
+2. Navigation : adresses, retour avec état conservé, annuaire « Clients », bouton « Détail » du panneau.
 3. Page fiche : en-tête et colonne de droite.
 4. Historique : onglets Activité et Mails envoyés, « Voir le mail ».
 5. Précédent / suivant et raccourcis `J` / `K`.
-6. États (chargement, erreur, introuvable, vides) et mobile. Retrait du panneau latéral.
+6. États (chargement, erreur, introuvable, vides) et mobile.
 
 ---
 
