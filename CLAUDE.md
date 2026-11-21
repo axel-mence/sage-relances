@@ -70,3 +70,12 @@ Source : `ameliorations-ui-ux/ameliorations-ui-ux.md` (captures dans `captures/`
   - Oui : `feat(relance): ajoute la relance depuis une ligne`
   - Non : `feat(relance): permet de relancer un client depuis sa ligne avec toast et KPI`
 - Un commit par étape de construction au minimum (spec, section 12). Pas de commit ni de push sans validation d'Axel.
+
+## Pull requests
+
+- Numéro : attribué automatiquement par GitHub (#1, #2, #3…), dans l'ordre d'ouverture. On ne le répète pas dans le titre.
+- Titre : `Catégorie : description claire`, en français, compréhensible sans lire le code.
+  - Catégories : `Feature` (nouvelle fonctionnalité), `UX` (parcours, structure, interactions), `UI` (visuel, DA, composants), `Fix` (correction), `Refactor` (code sans changement visible), `Docs`, `Chore` (outillage).
+  - Oui : `UI : Navbar avec pictos`, `Feature : Connexion à la boîte mail`
+  - Non : `feat/table-filtres`, `Table et filtres : liste au format Stripe`
+- Description : contexte, ce qui change, captures, comment tester (lien Vercel), limites connues.
