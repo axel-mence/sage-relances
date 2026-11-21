@@ -5,9 +5,8 @@ import { ListEmpty, ListError, ListNoResult, ListSkeleton } from '../components/
 import { SearchField } from '../components/search-field'
 import { StatusPills } from '../components/status-pills'
 import { TimeSaved } from '../components/time-saved'
-import { FILTERS, URGENCE, type StatusFilter } from '../domain/filters'
+import { FILTERS, parGravite, type StatusFilter } from '../domain/filters'
 import { de, formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
-import { tauxCompletude } from '../domain/status'
 import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useElementHeight } from '../hooks/use-element-height'
@@ -82,10 +81,7 @@ export function Dashboard({ active }: DashboardProps) {
         (filter === 'tous' || c.statut === filter) &&
         (!search || normalize(c.nom).includes(search) || normalize(c.collaborateur).includes(search)),
     )
-    .sort(
-      (a, b) =>
-        URGENCE.indexOf(a.statut) - URGENCE.indexOf(b.statut) || tauxCompletude(a) - tauxCompletude(b),
-    )
+    .sort(parGravite)
 
 
   // Client ouvert dans le panneau latéral (lu dans la liste : il suit les relances)

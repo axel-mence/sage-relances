@@ -35,10 +35,18 @@ function subscribe(listener: () => void) {
   }
 }
 
-// Va vers une nouvelle adresse, en mémorisant d'abord la position de défilement de la page quittée
-export function navigate(path: string, state: HistoryState = {}) {
-  window.history.replaceState({ ...window.history.state, scrollY: window.scrollY }, '')
-  window.history.pushState(state, '', path)
+/*
+  Va vers une nouvelle adresse, en mémorisant d'abord la position de défilement de la page quittée.
+  replace : remplace l'entrée courante au lieu d'en ajouter une (précédent / suivant entre fiches :
+  le retour du navigateur ramène alors à la page d'origine, pas au client d'avant).
+*/
+export function navigate(path: string, state: HistoryState = {}, { replace = false } = {}) {
+  if (replace) {
+    window.history.replaceState(state, '', path)
+  } else {
+    window.history.replaceState({ ...window.history.state, scrollY: window.scrollY }, '')
+    window.history.pushState(state, '', path)
+  }
   listeners.forEach((listener) => listener())
 }
 

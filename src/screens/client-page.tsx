@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '../api/clients-api'
 import { Button } from '../components/button'
+import { ClientNavigator } from '../components/client-navigator'
 import { ContactBloc, DerniereRelanceBloc, EntrepriseBloc, PiecesBloc } from '../components/client-details'
 import { StatusBadge } from '../components/status-badge'
 import { TabPanel, Tabs } from '../components/tabs'
@@ -28,16 +29,20 @@ export function ClientPage({ slug }: ClientPageProps) {
 
   return (
     <main className="flex min-w-0 flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:py-8 xl:px-8">
-      <a
-        href="/clients"
-        onClick={(event) => {
-          event.preventDefault()
-          backFromClient()
-        }}
-        className="self-start text-label text-secondary hover:text-primary"
-      >
-        ‹ {backLabel()}
-      </a>
+      {/* Retour à gauche, flèches précédent / suivant à droite */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <a
+          href="/clients"
+          onClick={(event) => {
+            event.preventDefault()
+            backFromClient()
+          }}
+          className="text-label text-secondary hover:text-primary"
+        >
+          ‹ {backLabel()}
+        </a>
+        <ClientNavigator slug={slug} />
+      </div>
 
       {client.loading && !client.data ? (
         <p className="text-secondary">Chargement de la fiche…</p>
