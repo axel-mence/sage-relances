@@ -47,6 +47,21 @@ src/
 - Accessibilité : contraste AA, navigation clavier sur onglets, lignes, boutons et panneau (Échap ferme le panneau).
 - Pas de `console.log` de debug ni de code mort.
 
+## Design system
+
+- v1 : spec, section 10. Tokens dans `src/index.css` (bloc `@theme`), avec 3 teintes foncées pour le contraste AA (commentées dans le fichier).
+- v2 en cours : `ameliorations-ui-ux/ameliorations-ui-ux.md`, section 4. Ajouts : dégradé `bg-gradient-retard` (barre de répartition uniquement), chiffres tabulaires dans les tableaux et KPI.
+- Bichromie noir et vert pour tout le reste. Aucune autre couleur que le noir, le vert et les statuts.
+
+## Itération UX/UI (DS v2)
+
+Source : `ameliorations-ui-ux/ameliorations-ui-ux.md` (captures dans `captures/`).
+
+- Les « Notes d'Axel » (N1, N2, N3) font foi. Si une note contredit `spec.md` ou une autre règle, le signaler au lieu de choisir seul.
+- Ouvrir les captures avant d'implémenter : reproduire le principe, pas le style de l'app d'origine (le DS du projet fait foi).
+- Une étape de la section 5 à la fois : dire ce qui va être fait, le faire, montrer le rendu sur le serveur de dev, attendre la validation d'Axel, puis commiter.
+- Un commit par étape validée, avec le message prévu dans le MD (raccourci si le titre dépasse 50 caractères, voir plus bas).
+
 ## Git
 
 - Branche de travail : `feature/relance-pieces`.

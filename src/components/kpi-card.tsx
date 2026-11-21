@@ -26,7 +26,7 @@ export function KpiCard({ label, value, hint, tone = 'default', loading = false,
       ) : unavailable ? (
         <span className="text-section text-muted">Indisponible</span>
       ) : (
-        <span className={`text-kpi ${TONES[tone]}`}>{value}</span>
+        <span className={`text-kpi tabular-nums ${TONES[tone]}`}>{value}</span>
       )}
 
       {hint && !loading && <span className="text-caption text-secondary">{hint}</span>}

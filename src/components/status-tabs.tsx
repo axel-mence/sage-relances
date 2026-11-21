@@ -60,7 +60,7 @@ export function StatusTabs({ value, counts, onChange, panelId }: StatusTabsProps
               {tab.label}
               {counts && (
                 <span
-                  className={`rounded-sm px-1.5 text-caption ${
+                  className={`rounded-sm px-1.5 text-caption tabular-nums ${
                     selected ? 'bg-primary text-white' : 'bg-status-relancee-bg text-secondary'
                   }`}
                 >

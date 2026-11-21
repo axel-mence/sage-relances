@@ -37,6 +37,14 @@
   --color-status-relancee: #111111;
   --color-status-relancee-bg: #ededed;
 
+  /*
+    DS v2 · Dégradé « retard » (note N2) : utilisé uniquement dans la barre de répartition.
+    Couleurs v1 d'origine, sans texte posé dessus : l'ajustement AA de status-attente ne s'applique pas ici.
+  */
+  --color-gradient-retard-start: #56a538;
+  --color-gradient-retard-mid: #b26b00;
+  --color-gradient-retard-end: #c2382d;
+
   /* Typo : Inter, chargée dans index.html */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
@@ -68,6 +76,21 @@
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
+}
+
+/* DS v2 · Classe « bg-gradient-retard » : vert (à jour) → orange (retard léger) → rouge (retard fort) */
+@utility bg-gradient-retard {
+  background-image: linear-gradient(
+    to right,
+    var(--color-gradient-retard-start),
+    var(--color-gradient-retard-mid),
+    var(--color-gradient-retard-end)
+  );
+}
+
+/* DS v2 · Chiffres tabulaires (largeur fixe) dans les tableaux : les colonnes de nombres et de dates restent alignées */
+table {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Base de la page */
