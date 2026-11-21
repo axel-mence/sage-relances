@@ -169,7 +169,7 @@ Réutilisation : Button, StatusBadge, Completude, Avatar, NavIcon, toasts, squel
 - [ ] Clavier : onglets aux flèches, `J` / `K`, focus visible. Contraste AA en clair et en sombre.
 - [ ] Lint, tests (activité calculée, slug, précédent / suivant) et build passent. La PR vise `main`, avec le lien Vercel.
 
-### 11. Étapes de construction (proposées, à valider après les wireframes)
+### 11. Étapes de construction (validées et livrées)
 
 1. Données : `clientDepuis`, contenu des relances, activité calculée + tests.
 2. Navigation : adresses, retour avec état conservé, annuaire « Clients », bouton « Détail » du panneau.

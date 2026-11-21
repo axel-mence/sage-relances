@@ -1,18 +1,19 @@
 # CLAUDE.md · Relance des pièces manquantes (Sage Experience, cas fictif)
 
-Complète le `CLAUDE.md` global d'Axel. La spec de référence est [spec.md](spec.md) : en cas de doute, elle fait foi.
+Complète le `CLAUDE.md` global d'Axel. Specs de référence : [spec.md](spec.md) (tableau de bord) et [spec-clients-relances.md](spec-clients-relances.md) (pages Clients et Relances). En cas de doute, elles font foi.
 
 ## Projet
 
 - Feature : tableau de bord associé pour suivre les pièces manquantes des clients d'un cabinet comptable et les relancer en un clic.
 - Cas pratique fictif : cabinet, clients et chiffres inventés. Aucune donnée réelle.
-- V1 : écran 01 (tableau de bord) + écran 03 (fiche client en panneau latéral). Le reste est hors périmètre (voir spec, section 5).
+- Pages : tableau de bord `/` (aperçu client en panneau latéral), annuaire `/clients`, page client `/clients/:slug`. Relances (séquence automatique) : partie 2 de spec-clients-relances, à venir.
 
 ## Stack
 
 - React 19 + TypeScript + Vite.
-- CSS : Tailwind, avec les tokens du DS v1 (spec, section 10) déclarés dans la config. Jamais de couleur, d'espacement ou de rayon en dur.
-- Typo : Inter.
+- CSS : Tailwind 4, avec les tokens du DS Nudge v2 (Figma) dans `src/index.css` (variables `--ds-*`, modes clair et sombre). Jamais de couleur, d'espacement ou de rayon en dur.
+- Typo : Sora (titres, chiffres) et Inter (interface).
+- Navigation : routeur maison sur l'History API (`src/hooks/use-route.ts`), sans bibliothèque. `vercel.json` renvoie toutes les adresses vers `index.html`.
 - API simulée : fonctions dans `src/api/` qui lisent `src/data/clients.json`, avec latence de 400 à 800 ms et échec activable via `?fail=1`.
 - Tests : Vitest (règle de statut, API simulée).
 - Lint : oxlint (`npm run lint`).
@@ -28,15 +29,16 @@ Complète le `CLAUDE.md` global d'Axel. La spec de référence est [spec.md](spe
 
 Node est installé dans `~/.local/node` (ajouté au PATH dans `~/.zshrc`).
 
-## Arborescence visée
+## Arborescence
 
 ```
 src/
   api/          API simulée (logiciel comptable)
   data/         clients.json (24 clients fictifs)
-  domain/       types et règle de statut (calculée, jamais stockée)
-  components/   Badge, Button, KpiCard, ClientRow, SidePanel
-  screens/      Dashboard, ClientPanel
+  domain/       types, statut, activité, mail, tri : calculés, jamais stockés (+ tests)
+  components/   composants du DS (Button, StatusBadge, Tabs, Timeline, blocs de la fiche…)
+  hooks/        useAsync, useRelance (parcours de relance), use-route (navigation)
+  screens/      Dashboard, ClientPanel, ClientsDirectory, ClientPage, MailPreview
 ```
 
 ## Conventions
@@ -49,9 +51,9 @@ src/
 
 ## Design system
 
-- v1 : spec, section 10. Tokens dans `src/index.css` (bloc `@theme`), avec 3 teintes foncées pour le contraste AA (commentées dans le fichier).
-- v2 en cours : `ameliorations-ui-ux/ameliorations-ui-ux.md`, section 4. Ajouts : dégradé `bg-gradient-retard` (barre de répartition uniquement), chiffres tabulaires dans les tableaux et KPI.
-- Bichromie noir et vert pour tout le reste. Aucune autre couleur que le noir, le vert et les statuts.
+- DS Nudge v2 (Figma, page « DS Nudge · v2 ») : tokens dans `src/index.css`, modes clair (défaut) et sombre. 2 teintes foncées par rapport à Figma pour le contraste AA (commentées dans le fichier).
+- Composants ajoutés pour la page client (validés dans spec-clients-relances, section 8) : onglets, ligne de timeline, flèches précédent / suivant.
+- Ne pas créer de nouveau composant ou token sans le proposer à Axel.
 
 ## Itération UX/UI (DS v2)
 
