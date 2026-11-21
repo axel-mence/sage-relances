@@ -5,17 +5,15 @@ import { ListEmpty, ListError, ListNoResult, ListSkeleton } from '../components/
 import { SearchField } from '../components/search-field'
 import { StatusPills } from '../components/status-pills'
 import { TimeSaved } from '../components/time-saved'
-import { Toasts } from '../components/toasts'
 import { FILTERS, URGENCE, type StatusFilter } from '../domain/filters'
-import { formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
+import { de, formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
 import { tauxCompletude } from '../domain/status'
 import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useElementHeight } from '../hooks/use-element-height'
 import { useNow } from '../hooks/use-now'
+import { useRelance } from '../hooks/use-relance'
 import { navigate } from '../hooks/use-route'
-import { MailPreview } from './mail-preview'
-import { useToasts } from '../hooks/use-toasts'
 
 type DashboardProps = {
   // Faux quand une fiche client est ouverte : la liste reste montée mais cachée (état conservé)
@@ -34,76 +32,30 @@ export function Dashboard({ active }: DashboardProps) {
   // Barre de filtres collée en haut (sticky) : sa hauteur sert à coller les titres de colonnes juste dessous
   const [filtersBar, setFiltersBar] = useState<HTMLDivElement | null>(null)
   const filtersHeight = useElementHeight(filtersBar)
-  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
-  const toasts = useToasts()
-
-  /*
-    Relance d'un client (parcours, étape 3) :
-    bouton en chargement → appel API → succès : toast, client remplacé (statut « Relancée »), KPI rafraîchis
-                                     → échec : toast d'erreur, rien ne change
-    Utilisée par le tableau et par le panneau : renvoie le client à jour, ou rien en cas d'échec.
-  */
-  async function handleRelancer(
-    client: ClientView,
-    mail?: { objet: string; message: string },
-  ): Promise<ClientView | undefined> {
-    setPendingIds((ids) => new Set(ids).add(client.id))
-    try {
-      const updated = await api.postRelance(client.id, mail)
+  // Relance depuis une ligne : aperçu du mail, puis le client relancé remplace l'ancien dans la liste
+  const relance = useRelance({
+    now,
+    onSent: (updated) => {
       clients.update((list) => list.map((c) => (c.id === updated.id ? updated : c)))
       kpis.reload({ silent: true })
-      toasts.show(`Relance envoyée à ${client.nom}`)
-      return updated
-    } catch {
-      toasts.show(`La relance de ${client.nom} n'a pas pu être envoyée. Réessayez.`, 'error')
-      return undefined
-    } finally {
-      setPendingIds((ids) => {
-        const next = new Set(ids)
-        next.delete(client.id)
-        return next
-      })
-    }
-  }
-
-  /*
-    Aperçu du mail avant l'envoi : « Relancer » (table ou fiche) ouvre la fenêtre d'aperçu,
-    et la promesse se résout quand elle se ferme : avec le client à jour si la relance est partie, sinon rien.
-    Le tableau et la fiche n'ont donc pas à savoir qu'un aperçu s'intercale.
-  */
-  const [draft, setDraft] = useState<{ client: ClientView; resolve: (updated?: ClientView) => void }>()
-
-  function requestRelance(client: ClientView) {
-    return new Promise<ClientView | undefined>((resolve) => setDraft({ client, resolve }))
-  }
-
-  async function sendDraft(mail: { objet: string; message: string }) {
-    if (!draft) return false
-    const updated = await handleRelancer(draft.client, mail)
-    if (updated) draft.resolve(updated)
-    return Boolean(updated)
-  }
-
-  function closeDraft() {
-    // Sans effet si la promesse est déjà résolue (relance envoyée)
-    draft?.resolve(undefined)
-    setDraft(undefined)
-  }
+    },
+  })
 
   /*
     Retour sur la liste après une fiche : on rafraîchit sans squelette, pour refléter une relance faite dans la fiche.
-    Pas au premier affichage (les données viennent d'être chargées).
+    Pas au tout premier affichage de la liste (les données viennent d'être chargées).
+    Si l'app s'ouvre directement sur une fiche, la liste est chargée cachée : on rafraîchit alors au premier retour.
   */
-  const dejaAffichee = useRef(false)
+  const premierAffichage = useRef(active)
   const reloadClients = clients.reload
   const reloadKpis = kpis.reload
   useEffect(() => {
     if (!active) return
-    if (dejaAffichee.current) {
+    if (!premierAffichage.current) {
       reloadClients({ silent: true })
       reloadKpis({ silent: true })
     }
-    dejaAffichee.current = true
+    premierAffichage.current = false
   }, [active, reloadClients, reloadKpis])
 
   // Nombre de clients par filtre (pastilles), calculé sur toute la liste
@@ -154,8 +106,6 @@ export function Dashboard({ active }: DashboardProps) {
     if (kpis.error) kpis.reload()
   }
 
-  const toastZone = <Toasts toasts={toasts.toasts} onDismiss={toasts.dismiss} />
-
   return (
     <>
       <main className="flex min-w-0 flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:py-8 xl:px-8">
@@ -164,7 +114,7 @@ export function Dashboard({ active }: DashboardProps) {
           <div className="flex flex-col gap-1">
             <h1 className="font-display text-title">Pièces manquantes</h1>
             <p className="text-secondary">
-              Pièces de {formatPeriode(now)} · Échéance TVA le {formatJourMois(prochaineEcheanceTva(now))}
+              Pièces {de(formatPeriode(now))} · Échéance TVA le {formatJourMois(prochaineEcheanceTva(now))}
             </p>
           </div>
           <TimeSaved
@@ -213,30 +163,16 @@ export function Dashboard({ active }: DashboardProps) {
               <ClientTable
                 clients={visibleClients}
                 now={now}
-                onRelancer={requestRelance}
+                onRelancer={relance.requestRelance}
                 onOpen={openClient}
-                pendingIds={pendingIds}
+                pendingIds={relance.pendingIds}
               />
             )}
           </div>
         </section>
       </main>
 
-      {draft && (
-        <MailPreview
-          // Une nouvelle fenêtre (et un nouveau brouillon) par client
-          key={draft.client.id}
-          client={draft.client}
-          now={now}
-          pending={pendingIds.has(draft.client.id)}
-          onSend={sendDraft}
-          onClose={closeDraft}
-          toasts={toastZone}
-        />
-      )}
-
-      {/* Une seule zone de toasts à la fois : dans l'aperçu s'il est ouvert, sinon ici */}
-      {!draft && toastZone}
+      {relance.elements}
     </>
   )
 }

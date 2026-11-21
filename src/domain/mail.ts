@@ -1,4 +1,4 @@
-import { formatJourMois, formatPeriode } from './format'
+import { de, formatJourMois, formatPeriode } from './format'
 import { piecesManquantes, toDateKey } from './status'
 import type { Client, PieceAttendue } from './types'
 
@@ -7,11 +7,6 @@ export interface MailRelance {
   destinataire: string // « Marc Peyrot <marc@garage-peyrot.fr> »
   objet: string
   message: string
-}
-
-// « de » élidé devant une voyelle : « d'octobre 2026 », « de novembre 2026 »
-function de(mot: string) {
-  return /^[aeiouyéèêàâîôû]/i.test(mot) ? `d'${mot}` : `de ${mot}`
 }
 
 type Signature = {
