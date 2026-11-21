@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react'
 import { api } from '../api/clients-api'
 import { ClientTable } from '../components/client-table'
-import { KpiCard } from '../components/kpi-card'
+import { DistributionBar } from '../components/distribution-bar'
 import { ListEmpty, ListError, ListSkeleton } from '../components/list-states'
 import { MobileTopBar, Sidebar } from '../components/sidebar'
 import { StatusTabs } from '../components/status-tabs'
+import { TimeSaved } from '../components/time-saved'
 import { Toasts } from '../components/toasts'
 import { TABS, type StatusFilter } from '../domain/filters'
-import { formatDuree, formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
+import { formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
 import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useNow } from '../hooks/use-now'
@@ -61,8 +62,6 @@ export function Dashboard() {
 
   const visibleClients = (clients.data ?? []).filter((c) => filter === 'tous' || c.statut === filter)
 
-  // Props communes aux 4 cartes : chargement et erreur (spec, section 8)
-  const kpiState = { loading: kpis.loading, unavailable: !!kpis.error }
 
   // « Réessayer » recharge la liste, et les KPI s'ils étaient aussi en erreur
   function handleRetry() {
@@ -78,41 +77,28 @@ export function Dashboard() {
       <Sidebar />
 
       <main className="flex min-w-0 flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:py-8 xl:px-8">
-        <header className="flex flex-col gap-1">
-          <h1 className="text-title">Pièces manquantes</h1>
-          <p className="text-secondary">
-            Pièces de {formatPeriode(now)} · Échéance TVA le {formatJourMois(prochaineEcheanceTva(now))}
-          </p>
+        {/* En-tête : titre à gauche, temps gagné mis en avant à droite (en dessous sur mobile) */}
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-title">Pièces manquantes</h1>
+            <p className="text-secondary">
+              Pièces de {formatPeriode(now)} · Échéance TVA le {formatJourMois(prochaineEcheanceTva(now))}
+            </p>
+          </div>
+          <TimeSaved
+            minutes={kpis.data?.tempsGagneMinutes}
+            relances={kpis.data?.relancesSemaine}
+            loading={kpis.loading}
+            error={!!kpis.error}
+          />
         </header>
 
-        <section aria-label="Indicateurs du cabinet" className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <KpiCard
-            label="Dossiers complets"
-            value={String(kpis.data?.dossiersComplets ?? 0)}
-            hint={`sur ${kpis.data?.totalDossiers ?? 180} dossiers`}
-            {...kpiState}
-          />
-          <KpiCard
-            label="En retard"
-            value={String(kpis.data?.enRetard ?? 0)}
-            hint="échéance dépassée"
-            tone="danger"
-            {...kpiState}
-          />
-          <KpiCard
-            label="Relances cette semaine"
-            value={String(kpis.data?.relancesSemaine ?? 0)}
-            hint="sur les 7 derniers jours"
-            {...kpiState}
-          />
-          <KpiCard
-            label="Temps gagné estimé"
-            value={formatDuree(kpis.data?.tempsGagneMinutes ?? 0)}
-            hint="cette semaine, à l'échelle du cabinet"
-            tone="success"
-            {...kpiState}
-          />
-        </section>
+        {/* Barre de répartition (N2) : un clic sur un segment filtre la liste sur ce statut */}
+        {clients.data ? (
+          <DistributionBar counts={counts} active={filter} onSelect={setFilter} />
+        ) : (
+          clients.loading && <span aria-hidden="true" className="h-2 animate-pulse rounded-full bg-border" />
+        )}
 
         <section aria-label="Clients" className="flex flex-col gap-4">
           <StatusTabs value={filter} counts={clients.data ? counts : undefined} onChange={setFilter} panelId="clients-panel" />

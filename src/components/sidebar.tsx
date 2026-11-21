@@ -21,10 +21,14 @@ function Logo() {
   )
 }
 
-// Barre latérale fixe sur grand écran (lg et plus)
+/*
+  Barre latérale sur grand écran (lg et plus).
+  Collée en haut (sticky) et haute d'un écran exactement : elle ne défile jamais avec la page,
+  et le bloc utilisateur reste toujours visible en bas.
+*/
 export function Sidebar() {
   return (
-    <aside className="hidden w-60 shrink-0 flex-col justify-between border-r border-border bg-surface p-4 lg:flex">
+    <aside className="sticky top-0 hidden h-dvh w-60 shrink-0 flex-col justify-between overflow-y-auto border-r border-border bg-surface p-4 lg:flex">
       <div className="flex flex-col gap-8">
         <Logo />
         <nav aria-label="Navigation principale">

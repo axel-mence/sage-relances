@@ -44,7 +44,7 @@ function PiecesManquantes({ client }: { client: ClientView }) {
       {/* Largeur bornée ici (et pas sur la cellule, que le tableau ignore) pour couper avec « … » */}
       <span
         title={libellesManquants(client).join(', ')}
-        className="truncate text-caption text-secondary lg:max-w-24 xl:max-w-56"
+        className="truncate text-caption text-secondary lg:max-w-20 xl:max-w-48"
       >
         {resumePieces(libellesManquants(client))}
       </span>
@@ -97,13 +97,13 @@ export function ClientTable({ clients, now, onRelancer, onOpen, pendingIds }: Cl
         <table className="w-full text-left whitespace-nowrap">
           <thead className="border-b border-border text-caption text-secondary">
             <tr>
-              <th scope="col" className="px-3 py-3 font-medium">Client</th>
-              <th scope="col" className="hidden px-3 py-3 font-medium xl:table-cell">Collaborateur</th>
-              <th scope="col" className="px-3 py-3 font-medium">Pièces manquantes</th>
-              <th scope="col" className="px-3 py-3 font-medium">Échéance</th>
-              <th scope="col" className="px-3 py-3 font-medium">Statut</th>
-              <th scope="col" className="px-3 py-3 font-medium">Dernière relance</th>
-              <th scope="col" className="px-3 py-3 font-medium">
+              <th scope="col" className="px-2.5 py-3 xl:px-3 font-medium">Client</th>
+              <th scope="col" className="hidden px-2.5 py-3 xl:px-3 font-medium xl:table-cell">Collaborateur</th>
+              <th scope="col" className="px-2.5 py-3 xl:px-3 font-medium">Pièces manquantes</th>
+              <th scope="col" className="px-2.5 py-3 xl:px-3 font-medium">Échéance</th>
+              <th scope="col" className="px-2.5 py-3 xl:px-3 font-medium">Statut</th>
+              <th scope="col" className="px-2.5 py-3 xl:px-3 font-medium">Dernière relance</th>
+              <th scope="col" className="px-2.5 py-3 xl:px-3 font-medium">
                 <span className="sr-only">Action</span>
               </th>
             </tr>
@@ -115,17 +115,17 @@ export function ClientTable({ clients, now, onRelancer, onOpen, pendingIds }: Cl
                 onClick={() => onOpen(client)}
                 className="cursor-pointer border-b border-border last:border-b-0 hover:bg-page"
               >
-                <th scope="row" className="px-3 py-3 text-left font-normal">
+                <th scope="row" className="px-2.5 py-3 xl:px-3 text-left font-normal">
                   <OpenButton client={client} onOpen={onOpen} />
                   {/* Collaborateur sous le nom quand la colonne dédiée est masquée */}
                   <span className="block text-caption text-secondary xl:hidden">{client.collaborateur}</span>
                 </th>
-                <td className="hidden px-3 py-3 whitespace-nowrap text-secondary xl:table-cell">{client.collaborateur}</td>
-                <td className="px-3 py-3"><PiecesManquantes client={client} /></td>
-                <td className="px-3 py-3 whitespace-nowrap"><Echeance client={client} now={now} /></td>
-                <td className="px-3 py-3"><StatusBadge status={client.statut} /></td>
-                <td className="px-3 py-3 whitespace-nowrap text-secondary">{formatRelatif(client.derniereRelance, now)}</td>
-                <td className="px-3 py-3 text-right"><RelancerButton client={client} pending={pendingIds.has(client.id)} onRelancer={onRelancer} /></td>
+                <td className="hidden px-2.5 py-3 xl:px-3 whitespace-nowrap text-secondary xl:table-cell">{client.collaborateur}</td>
+                <td className="px-2.5 py-3 xl:px-3"><PiecesManquantes client={client} /></td>
+                <td className="px-2.5 py-3 xl:px-3 whitespace-nowrap"><Echeance client={client} now={now} /></td>
+                <td className="px-2.5 py-3 xl:px-3"><StatusBadge status={client.statut} /></td>
+                <td className="px-2.5 py-3 xl:px-3 whitespace-nowrap text-secondary">{formatRelatif(client.derniereRelance, now)}</td>
+                <td className="px-2.5 py-3 xl:px-3 text-right"><RelancerButton client={client} pending={pendingIds.has(client.id)} onRelancer={onRelancer} /></td>
               </tr>
             ))}
           </tbody>
