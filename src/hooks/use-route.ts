@@ -25,6 +25,8 @@ export type HistoryState = {
   sage?: 'annule' | 'connecte'
   // Fin de l'onboarding : le tableau de bord ouvre la modale d'invitation des collaborateurs
   invitation?: boolean
+  // Juste après la connexion : l'écran de chargement (preloader) se joue avant le SaaS
+  preloader?: boolean
 }
 
 // Le navigateur ne doit pas restaurer le défilement tout seul : on le fait nous-mêmes au bon moment
