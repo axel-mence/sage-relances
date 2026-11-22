@@ -1,5 +1,6 @@
-import { UTILISATEUR_CONNECTE } from '../api/clients-api'
+import { seDeconnecter, type Compte } from '../api/auth-api'
 import { navigate } from '../hooks/use-route'
+import { libelleRole, useSession } from '../hooks/use-session'
 import { Avatar } from './avatar'
 import { NavIcon, type NavIconName } from './nav-icon'
 import { NudgeLogo } from './nudge-logo'
@@ -28,7 +29,7 @@ const MAIN_ITEMS: NavItem[] = [
 
 // Entrées secondaires, en bas de la barre (comme l'administration chez n8n)
 const FOOTER_ITEMS: NavItem[] = [
-  { label: 'Paramètres', icon: 'parametres' },
+  { label: 'Paramètres', icon: 'parametres', path: '/parametres', match: (path) => path === '/parametres' },
   { label: 'Aide', icon: 'aide' },
 ]
 
@@ -79,10 +80,16 @@ function NavList({ items, path }: { items: NavItem[]; path: string }) {
 /*
   Barre latérale sur grand écran (lg et plus), sur le fond dégradé Nudge du thème actif (clair ou sombre).
   Structure reprise de n8n : navigation principale, section « Cabinet », thème et entrées secondaires en bas,
-  puis le bloc utilisateur. Collée en haut (sticky) et haute d'un écran exactement :
+  puis le bloc du compte connecté (nom, rôle, déconnexion). Collée en haut (sticky) et haute d'un écran exactement :
   elle ne défile jamais avec la page, et le bloc utilisateur reste toujours visible en bas.
 */
+// Nom affiché : celui saisi à l'inscription, sinon l'email
+function nomAffiche(compte: Compte | null) {
+  return compte?.nom || compte?.email || ''
+}
+
 export function Sidebar({ path }: { path: string }) {
+  const compte = useSession()
   return (
     <aside className="bg-nudge-light dark:bg-nudge-dark sticky top-0 hidden h-dvh w-60 shrink-0 flex-col overflow-y-auto border-r border-border lg:flex">
       <div className="px-6 pt-6 pb-4">
@@ -111,10 +118,13 @@ export function Sidebar({ path }: { path: string }) {
       <div className="border-t border-border px-6 py-4">
         <div className="flex items-center gap-3">
           <Avatar />
-          <div className="flex min-w-0 flex-col">
-            <span className="text-label text-primary">{UTILISATEUR_CONNECTE}</span>
-            <span className="text-caption text-secondary">Associée</span>
+          <div className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate text-label text-primary">{nomAffiche(compte)}</span>
+            <span className="truncate text-caption text-secondary">
+              {compte ? `${libelleRole(compte)}${compte.cabinet ? ` · ${compte.cabinet}` : ''}` : ''}
+            </span>
           </div>
+          <BoutonDeconnexion />
         </div>
       </div>
     </aside>
@@ -126,6 +136,7 @@ export function Sidebar({ path }: { path: string }) {
   Dessous, les 2 pages principales en onglets (Tableau de bord, Clients), pour y accéder sans menu.
 */
 export function MobileTopBar({ path }: { path: string }) {
+  const compte = useSession()
   const pages = MAIN_ITEMS.filter((item) => item.path)
   return (
     <header className="border-b border-border bg-surface lg:hidden">
@@ -137,9 +148,18 @@ export function MobileTopBar({ path }: { path: string }) {
         </div>
         <div className="flex items-center gap-3">
           <ThemeToggle compact />
-          {/* Sur mobile, l'avatar seul : le nom est lu grâce au texte masqué */}
-          <span className="sr-only">{UTILISATEUR_CONNECTE}</span>
-          <Avatar size="sm" />
+          {/* Sur mobile, l'avatar mène aux paramètres (compte, connecteurs, déconnexion) */}
+          <a
+            href="/parametres"
+            onClick={(event) => {
+              event.preventDefault()
+              navigate('/parametres')
+            }}
+            aria-label={`Paramètres du compte de ${nomAffiche(compte)}`}
+            className="rounded-full"
+          >
+            <Avatar size="sm" />
+          </a>
         </div>
       </div>
       <nav aria-label="Navigation principale" className="flex gap-6 px-4">
@@ -162,5 +182,22 @@ export function MobileTopBar({ path }: { path: string }) {
         })}
       </nav>
     </header>
+  )
+}
+
+// Déconnexion : la session est fermée, l'app ramène d'elle-même à la page de connexion
+export function BoutonDeconnexion() {
+  return (
+    <button
+      type="button"
+      onClick={seDeconnecter}
+      aria-label="Se déconnecter"
+      title="Se déconnecter"
+      className="grid size-8 shrink-0 cursor-pointer place-items-center rounded-sm text-secondary hover:bg-surface-2 hover:text-primary"
+    >
+      <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4">
+        <path d="M6 2.5H3.5v11H6M10 5l3 3-3 3M13 8H6.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </button>
   )
 }
