@@ -7,6 +7,7 @@ Complète le `CLAUDE.md` global d'Axel. Specs de référence : [spec.md](spec.md
 - Feature : tableau de bord associé pour suivre les pièces manquantes des clients d'un cabinet comptable et les relancer en un clic.
 - Cas pratique fictif : cabinet, clients et chiffres inventés. Aucune donnée réelle.
 - Pages : tableau de bord `/` (aperçu client en panneau latéral), annuaire `/clients`, page client `/clients/:slug`. Relances (séquence automatique) : partie 2 de spec-clients-relances, à venir.
+- Avant le tableau de bord (refs-auth, tout simulé) : preloader 3D au lancement (une fois par session, `/test/preloader` pour le rejouer), connexion `/connexion`, inscription `/inscription` → `/inscription/code` → `/inscription/cabinet`, connexion Sage `/onboarding/sage` → `/autoriser` → `/import`, puis modale d'invitation sur le tableau de bord. Démo : mot de passe de moins de 8 caractères refusé, code `000000` expiré.
 
 ## Stack
 
@@ -33,12 +34,12 @@ Node est installé dans `~/.local/node` (ajouté au PATH dans `~/.zshrc`).
 
 ```
 src/
-  api/          API simulée (logiciel comptable)
+  api/          API simulée (logiciel comptable, authentification)
   data/         clients.json (24 clients fictifs)
   domain/       types, statut, activité, mail, tri : calculés, jamais stockés (+ tests)
-  components/   composants du DS (Button, StatusBadge, Tabs, Timeline, blocs de la fiche…)
+  components/   composants du DS (Button, StatusBadge, Tabs, Timeline, blocs de la fiche, AuthLayout, Preloader…)
   hooks/        useAsync, useRelance (parcours de relance), use-route (navigation)
-  screens/      Dashboard, ClientPanel, ClientsDirectory, ClientPage, MailPreview
+  screens/      Dashboard, ClientPanel, ClientsDirectory, ClientPage, MailPreview, Login, Signup…, SageConnect, InviteModal
 ```
 
 ## Conventions

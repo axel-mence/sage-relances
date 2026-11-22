@@ -19,6 +19,12 @@ export type HistoryState = {
   // Page d'où l'on a ouvert une fiche : le lien retour y ramène (« ‹ Tableau de bord », « ‹ Clients »)
   depuis?: { path: string; libelle: string }
   liste?: ListeOrigine
+  // Inscription : email saisi, rappelé sur l'écran du code à 6 chiffres
+  email?: string
+  // Connexion Sage : retour sur le choix du logiciel après une annulation ou un import réussi
+  sage?: 'annule' | 'connecte'
+  // Fin de l'onboarding : le tableau de bord ouvre la modale d'invitation des collaborateurs
+  invitation?: boolean
 }
 
 // Le navigateur ne doit pas restaurer le défilement tout seul : on le fait nous-mêmes au bon moment
