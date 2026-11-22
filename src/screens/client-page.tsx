@@ -189,7 +189,7 @@ function Historique({ client, now, onRelancer }: HistoriqueProps) {
         value={onglet}
         onChange={setOnglet}
       />
-      <TabPanel idPrefix="historique" value={onglet} className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pt-6 lg:pr-2">
+      <TabPanel idPrefix="historique" value={onglet} className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pt-6 lg:pr-6">
         {evenements.length > 0 ? (
           <Timeline client={client} evenements={evenements} now={now} />
         ) : onglet === 'mails' ? (
