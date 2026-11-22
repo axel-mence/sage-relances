@@ -17,12 +17,20 @@ type StatusPillsProps = {
 }
 
 /*
-  Pastilles de filtre d'un clic (format « filtres » de Stripe) : Tous, En retard, En attente, Relancés, Complets.
-  La pastille active est encadrée par l'accent ; aria-pressed annonce laquelle est choisie.
+  Pastilles de filtre d'un clic : Tous, En retard, En attente, Relancés, Complets.
+  Style « contrôle segmenté » (référence fournie par Axel) : un conteneur gris arrondi,
+  la pastille active ressort en blanc avec une ombre légère, les autres restent à plat.
+  En sombre, on inverse les surfaces pour que la pastille active reste la plus claire.
+  Sur mobile, la rangée défile à l'horizontale au lieu de passer à la ligne.
+  aria-pressed annonce laquelle est choisie.
 */
 export function StatusPills({ counts, value, onChange }: StatusPillsProps) {
   return (
-    <div role="group" aria-label="Filtrer par statut" className="flex flex-wrap gap-2">
+    <div
+      role="group"
+      aria-label="Filtrer par statut"
+      className="flex w-fit max-w-full gap-0.5 overflow-x-auto rounded-sm bg-surface-2 p-1 dark:bg-surface"
+    >
       {FILTERS.map((filter) => {
         const active = filter.value === value
         const dot = DOT[filter.value]
@@ -32,15 +40,15 @@ export function StatusPills({ counts, value, onChange }: StatusPillsProps) {
             type="button"
             aria-pressed={active}
             onClick={() => onChange(filter.value)}
-            className={`flex h-9 cursor-pointer items-center gap-2 rounded-sm border px-3 text-label transition-colors ${
+            className={`flex h-8 shrink-0 cursor-pointer items-center gap-2 rounded-xs px-3 text-label whitespace-nowrap transition-colors focus-visible:outline-offset-0 ${
               active
-                ? 'border-accent bg-surface-2 text-primary ring-1 ring-accent ring-inset'
-                : 'border-border bg-surface text-secondary hover:border-secondary hover:text-primary'
+                ? 'bg-surface text-primary shadow-xs dark:bg-surface-2'
+                : 'text-secondary hover:text-primary'
             }`}
           >
             {dot && <span aria-hidden="true" className={`size-2 rounded-full ${dot}`} />}
             {filter.label}
-            <span className="text-primary tabular-nums">{counts[filter.value]}</span>
+            <span className={`tabular-nums ${active ? 'text-primary' : 'text-muted'}`}>{counts[filter.value]}</span>
           </button>
         )
       })}
