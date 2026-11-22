@@ -24,3 +24,23 @@ export const URGENCE: DossierStatus[] = ['en_retard', 'en_attente', 'relancee', 
 export function parGravite(a: ClientView, b: ClientView): number {
   return URGENCE.indexOf(a.statut) - URGENCE.indexOf(b.statut) || tauxCompletude(a) - tauxCompletude(b)
 }
+
+// Tri choisi en cliquant sur un titre de colonne (sinon : tri par gravité)
+export type TriColonne = { cle: 'completude' | 'pieces'; sens: 'asc' | 'desc' }
+
+/*
+  Tri par colonne, puis gravité à égalité (un client en retard passe avant un client en attente au même taux).
+  - completude : taux de pièces reçues
+  - pieces : nombre de pièces manquantes
+*/
+export function parColonne({ cle, sens }: TriColonne) {
+  const valeur = (c: ClientView) => (cle === 'completude' ? tauxCompletude(c) : c.nbManquantes)
+  return (a: ClientView, b: ClientView) =>
+    (sens === 'asc' ? valeur(a) - valeur(b) : valeur(b) - valeur(a)) || parGravite(a, b)
+}
+
+// Clic sur un titre : décroissant, puis croissant, puis retour au tri par gravité
+export function triSuivant(actuel: TriColonne | undefined, cle: TriColonne['cle']): TriColonne | undefined {
+  if (actuel?.cle !== cle) return { cle, sens: 'desc' }
+  return actuel.sens === 'desc' ? { cle, sens: 'asc' } : undefined
+}

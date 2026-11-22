@@ -1,4 +1,5 @@
 import { useLayoutEffect } from 'react'
+import { KpisProvider } from './components/kpis-provider'
 import { MobileTopBar, Sidebar } from './components/sidebar'
 import { clientSlugFromPath, historyState, isClientsPath, usePath } from './hooks/use-route'
 import { ClientPage } from './screens/client-page'
@@ -38,7 +39,11 @@ function Shell() {
 }
 
 function App() {
-  return <Shell />
+  return (
+    <KpisProvider>
+      <Shell />
+    </KpisProvider>
+  )
 }
 
 export default App
