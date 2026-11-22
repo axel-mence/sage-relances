@@ -239,3 +239,24 @@ body {
     transform: translateY(8px);
   }
 }
+
+/*
+  Connexion, panneau droit : une pièce « arrive » (montée en fondu), reste affichée, puis s'efface
+  avant la boucle suivante (6 s). Le délai propre à chaque pièce crée la cascade.
+*/
+@keyframes piece-recue {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  8%,
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
