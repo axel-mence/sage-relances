@@ -200,3 +200,42 @@ body {
 :focus-visible {
   @apply outline-2 outline-offset-2 outline-accent;
 }
+
+/*
+  Preloader (src/components/preloader.tsx) : une lame de la grille.
+  Au repos, elle est à plat sur le plan, sa tranche (bordure haute) en vert sombre.
+  Au passage de la vague, elle pivote vers le haut et sa tranche s'éclaire en citron, puis retombe.
+  Une seule vague (pas de boucle) : à la fin, toutes les lames sont à plat, prêtes pour le fondu de sortie.
+*/
+.preloader-lame {
+  display: block;
+  /* Lame étroite dans sa case : l'espace entre 2 lames laisse voir le fond et donne le relief */
+  height: 2rem;
+  margin-bottom: 2.5rem;
+  background: var(--ds-surface);
+  border-top: 3px solid var(--ds-accent-subtle);
+  transform-origin: bottom;
+  animation: lame-vague 750ms cubic-bezier(0.45, 0, 0.25, 1) both;
+}
+
+@keyframes lame-vague {
+  0%,
+  100% {
+    transform: rotateX(0deg);
+    border-top-color: var(--ds-accent-subtle);
+    background: var(--ds-surface);
+  }
+  45% {
+    transform: rotateX(-82deg);
+    border-top-color: var(--ds-accent);
+    background: var(--ds-border);
+  }
+}
+
+/* Entrée de la carte du preloader : légère montée en fondu */
+@keyframes preloader-carte {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
