@@ -88,3 +88,31 @@ export function IconeCoche({ className = 'size-4' }: { className?: string }) {
     </svg>
   )
 }
+
+/*
+  Sage et Google, affichés mais inactifs (« Bientôt ») : le testeur passe par l'inscription par email,
+  qui crée un vrai compte. aria-disabled plutôt que disabled : le bouton reste lisible et annoncé.
+*/
+export function BoutonsSsoBientot({ verbe }: { verbe: 'Se connecter' | "S'inscrire" }) {
+  const options = [
+    { label: `${verbe} avec Sage`, logo: <LogoSage /> },
+    { label: 'Continuer avec Google', logo: <LogoGoogle /> },
+  ]
+  return (
+    <div className="flex flex-col gap-3">
+      {options.map((option) => (
+        <button
+          key={option.label}
+          type="button"
+          aria-disabled="true"
+          title="Bientôt disponible"
+          className="relative flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-sm border border-dashed border-border px-6 py-3 text-button text-muted"
+        >
+          <span className="opacity-60">{option.logo}</span>
+          {option.label}
+          <span className="absolute right-3 rounded-xs bg-surface-2 px-2 py-0.5 text-caption text-secondary">Bientôt</span>
+        </button>
+      ))}
+    </div>
+  )
+}

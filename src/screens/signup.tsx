@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { CompteExistant, creerCompte, type MethodeConnexion } from '../api/auth-api'
 import { AuthLayout } from '../components/auth-layout'
-import { CHAMP, IconeCoche, LienInterne, LogoGoogle, LogoSage, SeparateurOu } from '../components/auth-ui'
+import { BoutonsSsoBientot, CHAMP, IconeCoche, LienInterne, SeparateurOu } from '../components/auth-ui'
 import { Button } from '../components/button'
 import { navigate } from '../hooks/use-route'
 
@@ -10,9 +10,8 @@ const ARGUMENTS = ["14 jours d'essai", 'Sans carte bancaire', 'Connecté à Sage
 
 /*
   Inscription (refs-auth/inscription, même base que la connexion) :
-  SSO d'abord (Sage, Google), puis email + mot de passe.
-  - SSO : l'email est déjà vérifié, on passe directement aux infos du cabinet ;
-  - email : un code à 6 chiffres est envoyé, à saisir à l'étape suivante.
+  Sage et Google affichés en « Bientôt », puis email + mot de passe (crée un vrai compte).
+  Un code à 6 chiffres est ensuite envoyé, à saisir à l'étape suivante.
 */
 export function Signup() {
   const [enCours, setEnCours] = useState<MethodeConnexion | null>(null)
@@ -41,16 +40,7 @@ export function Signup() {
   return (
     <AuthLayout title="Fini les relances à la main." aside={<Arguments />}>
       <fieldset disabled={enCours !== null} className="flex flex-col gap-6">
-        <div className="flex flex-col gap-3">
-          <Button className="w-full" loading={enCours === 'sage'} onClick={() => inscrire('sage')}>
-            <LogoSage />
-            S'inscrire avec Sage
-          </Button>
-          <Button variant="secondary" className="w-full" loading={enCours === 'google'} onClick={() => inscrire('google')}>
-            <LogoGoogle />
-            Continuer avec Google
-          </Button>
-        </div>
+        <BoutonsSsoBientot verbe="S'inscrire" />
 
         <SeparateurOu />
 
@@ -84,7 +74,7 @@ export function Signup() {
               {erreur}
             </p>
           )}
-          <Button type="submit" variant="secondary" className="w-full" loading={enCours === 'email'}>
+          <Button type="submit" className="w-full" loading={enCours === 'email'}>
             Créer mon compte
           </Button>
         </form>
