@@ -4,12 +4,12 @@ import { ClientTable } from '../components/client-table'
 import { ListEmpty, ListError, ListNoResult, ListSkeleton } from '../components/list-states'
 import { SearchField } from '../components/search-field'
 import { StatusPills } from '../components/status-pills'
-import { TimeSaved } from '../components/time-saved'
-import { FILTERS, parGravite, type StatusFilter } from '../domain/filters'
+import { FILTERS, parColonne, parGravite, triSuivant, type StatusFilter, type TriColonne } from '../domain/filters'
 import { de, formatJourMois, formatPeriode, prochaineEcheanceTva } from '../domain/format'
 import type { ClientView } from '../domain/types'
 import { useAsync } from '../hooks/use-async'
 import { useElementHeight } from '../hooks/use-element-height'
+import { useKpis } from '../hooks/kpis-context'
 import { useNow } from '../hooks/use-now'
 import { useRelance } from '../hooks/use-relance'
 import { ClientPanel } from './client-panel'
@@ -23,12 +23,15 @@ type DashboardProps = {
 // Écran 01 · Tableau de bord des pièces manquantes (spec, section 7)
 export function Dashboard({ active }: DashboardProps) {
   const now = useNow()
-  const kpis = useAsync(api.getKpis)
+  // Indicateurs partagés (le temps gagné s'affiche dans la barre latérale)
+  const kpis = useKpis()
   // On charge tous les clients une fois et on filtre ici : les compteurs des pastilles restent justes
   const clients = useAsync(api.getClients)
   const [query, setQuery] = useState('')
   // Filtre de statut (pastilles d'un clic) : « Tous » par défaut
   const [filter, setFilter] = useState<StatusFilter>('tous')
+  // Tri par colonne (Complétude, Pièces manquantes) ; aucun : tri par gravité
+  const [tri, setTri] = useState<TriColonne>()
   // Barre de filtres collée en haut (sticky) : sa hauteur sert à coller les titres de colonnes juste dessous
   const [filtersBar, setFiltersBar] = useState<HTMLDivElement | null>(null)
   const filtersHeight = useElementHeight(filtersBar)
@@ -37,7 +40,6 @@ export function Dashboard({ active }: DashboardProps) {
     now,
     onSent: (updated) => {
       clients.update((list) => list.map((c) => (c.id === updated.id ? updated : c)))
-      kpis.reload({ silent: true })
     },
   })
 
@@ -48,15 +50,11 @@ export function Dashboard({ active }: DashboardProps) {
   */
   const premierAffichage = useRef(active)
   const reloadClients = clients.reload
-  const reloadKpis = kpis.reload
   useEffect(() => {
     if (!active) return
-    if (!premierAffichage.current) {
-      reloadClients({ silent: true })
-      reloadKpis({ silent: true })
-    }
+    if (!premierAffichage.current) reloadClients({ silent: true })
     premierAffichage.current = false
-  }, [active, reloadClients, reloadKpis])
+  }, [active, reloadClients])
 
   // Nombre de clients par filtre (pastilles), calculé sur toute la liste
   const counts = useMemo(() => {
@@ -66,6 +64,7 @@ export function Dashboard({ active }: DashboardProps) {
     ) as Record<StatusFilter, number>
   }, [clients.data])
 
+
   // Recherche sans tenir compte des majuscules ni des accents (« ines » trouve « Inès »)
   const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   const search = normalize(query.trim())
@@ -74,6 +73,7 @@ export function Dashboard({ active }: DashboardProps) {
     - « Tous » : du plus grave au moins grave (retard, attente, relancé, complet) ;
     - à statut égal, et quand une pastille est choisie : complétude la plus faible en haut (le plus de pièces à récupérer).
     À égalité, l'ordre de l'API (échéance puis pièces) est gardé.
+    Un clic sur « Complétude » ou « Pièces manquantes » remplace ce tri (gravité en départage).
   */
   const visibleClients = (clients.data ?? [])
     .filter(
@@ -81,7 +81,7 @@ export function Dashboard({ active }: DashboardProps) {
         (filter === 'tous' || c.statut === filter) &&
         (!search || normalize(c.nom).includes(search) || normalize(c.collaborateur).includes(search)),
     )
-    .sort(parGravite)
+    .sort(tri ? parColonne(tri) : parGravite)
 
 
   // Client ouvert dans le panneau latéral (lu dans la liste : il suit les relances)
@@ -112,20 +112,12 @@ export function Dashboard({ active }: DashboardProps) {
   return (
     <>
       <main className="flex min-w-0 flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:py-8 xl:px-8">
-        {/* En-tête : titre à gauche, temps gagné mis en avant à droite (en dessous sur mobile) */}
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex flex-col gap-1">
-            <h1 className="font-display text-title">Pièces manquantes</h1>
-            <p className="text-secondary">
-              Pièces {de(formatPeriode(now))} · Échéance TVA le {formatJourMois(prochaineEcheanceTva(now))}
-            </p>
-          </div>
-          <TimeSaved
-            minutes={kpis.data?.tempsGagneMinutes}
-            relances={kpis.data?.relancesSemaine}
-            loading={kpis.loading}
-            error={!!kpis.error}
-          />
+        {/* En-tête simple et sobre (choix d'Axel) : titre et contexte, sans fond */}
+        <header className="flex flex-col gap-1">
+          <h1 className="font-display text-title">Pièces manquantes</h1>
+          <p className="text-secondary">
+            Pièces {de(formatPeriode(now))} · Échéance TVA le {formatJourMois(prochaineEcheanceTva(now))}
+          </p>
         </header>
 
         <section
@@ -144,6 +136,24 @@ export function Dashboard({ active }: DashboardProps) {
           >
             <SearchField value={query} onChange={setQuery} />
             {clients.data && <StatusPills counts={counts} value={filter} onChange={setFilter} />}
+            {/* Mobile et tablette : pas de titres de colonnes, le tri se choisit ici */}
+            <label className="flex items-center gap-2 text-caption text-secondary lg:hidden">
+              Trier par
+              <select
+                value={tri ? `${tri.cle}-${tri.sens}` : 'gravite'}
+                onChange={(event) => {
+                  const [cle, sens] = event.target.value.split('-') as [TriColonne['cle'], TriColonne['sens']]
+                  setTri(event.target.value === 'gravite' ? undefined : { cle, sens })
+                }}
+                className="h-9 rounded-sm border border-border bg-surface px-2 text-label text-primary"
+              >
+                <option value="gravite">Gravité</option>
+                <option value="completude-asc">Complétude, la plus faible</option>
+                <option value="completude-desc">Complétude, la plus élevée</option>
+                <option value="pieces-desc">Pièces manquantes, le plus</option>
+                <option value="pieces-asc">Pièces manquantes, le moins</option>
+              </select>
+            </label>
           </div>
 
           {/* États de la liste : chargement, erreur, vide, puis table (spec, section 8) */}
@@ -169,6 +179,8 @@ export function Dashboard({ active }: DashboardProps) {
                 onRelancer={relance.requestRelance}
                 onOpen={(client) => setSelectedId(client.id)}
                 pendingIds={relance.pendingIds}
+                tri={tri}
+                onTri={(cle) => setTri((actuel) => triSuivant(actuel, cle))}
               />
             )}
           </div>

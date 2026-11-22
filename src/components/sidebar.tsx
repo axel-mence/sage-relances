@@ -1,9 +1,10 @@
-import { NOM_CABINET, UTILISATEUR_CONNECTE } from '../api/clients-api'
+import { UTILISATEUR_CONNECTE } from '../api/clients-api'
 import { navigate } from '../hooks/use-route'
 import { Avatar } from './avatar'
 import { NavIcon, type NavIconName } from './nav-icon'
 import { NudgeLogo } from './nudge-logo'
 import { ThemeToggle } from './theme-toggle'
+import { TimeSaved } from './time-saved'
 
 type NavItem = {
   label: string
@@ -93,13 +94,9 @@ export function Sidebar({ path }: { path: string }) {
           <NavList items={MAIN_ITEMS} path={path} />
         </div>
 
-        {/* Section « Cabinet » séparée par des filets, comme « Projects » chez n8n */}
-        <div className="flex flex-col gap-2 border-y border-border px-3 py-4">
-          <span className="px-3 text-caption text-muted">Cabinet</span>
-          <span className={`${ROW} text-primary`}>
-            <NavIcon name="cabinet" />
-            {NOM_CABINET}
-          </span>
+        {/* Temps gagné à la place du nom du cabinet (choix d'Axel), entre 2 filets comme une section n8n */}
+        <div className="border-y border-border px-6 py-5">
+          <TimeSaved />
         </div>
 
         {/* Pastille clair / sombre juste au-dessus des entrées secondaires */}
@@ -135,7 +132,8 @@ export function MobileTopBar({ path }: { path: string }) {
       <div className="flex h-14 items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <NudgeLogo variant="mark" className="h-7 text-accent" />
-          <span className="text-label text-primary">{NOM_CABINET}</span>
+          {/* Temps gagné en version courte (le détail est dans la barre latérale sur grand écran) */}
+          <TimeSaved variant="compact" />
         </div>
         <div className="flex items-center gap-3">
           <ThemeToggle compact />
