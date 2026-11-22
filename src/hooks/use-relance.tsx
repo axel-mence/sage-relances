@@ -4,6 +4,7 @@ import { Toasts } from '../components/toasts'
 import type { MailRelance } from '../domain/mail'
 import type { ClientView } from '../domain/types'
 import { MailPreview } from '../screens/mail-preview'
+import { useKpis } from './kpis-context'
 import { useToasts } from './use-toasts'
 
 type UseRelanceOptions = {
@@ -29,13 +30,14 @@ type UseRelance = {
 /*
   Parcours de relance, partagé par la liste et la fiche client :
   « Relancer » → aperçu du mail → « Envoyer la relance » → appel API
-    → succès : toast, fenêtre fermée, onSent(client à jour)
+    → succès : toast, fenêtre fermée, onSent(client à jour), temps gagné rafraîchi
     → échec : toast d'erreur, la fenêtre reste ouverte
 */
 export function useRelance({ now, onSent }: UseRelanceOptions): UseRelance {
   const [draft, setDraft] = useState<ClientView>()
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
   const toasts = useToasts()
+  const kpis = useKpis()
 
   async function send(mail: Pick<MailRelance, 'objet' | 'message'>) {
     if (!draft) return false
@@ -44,6 +46,8 @@ export function useRelance({ now, onSent }: UseRelanceOptions): UseRelance {
     try {
       const updated = await api.postRelance(client.id, mail)
       onSent(updated)
+      // Le temps gagné (barre latérale) augmente avec chaque relance
+      kpis.reload({ silent: true })
       toasts.show(`Relance envoyée à ${client.nom}`)
       return true
     } catch {

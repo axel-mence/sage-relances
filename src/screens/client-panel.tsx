@@ -96,12 +96,9 @@ function PanelContent({ client, now, pending, onRelancer, onDetail, onClose }: P
             <span className="shrink-0 text-primary">{client.contact.nom}</span>
             <span className="truncate select-all">{client.contact.email}</span>
           </p>
-          {/* « Lui écrire » (Outlook) et « Détail » (page client complète, avec tout l'historique) */}
-          <div className="mt-3 flex flex-wrap gap-2">
+          {/* « Lui écrire » : nouveau mail dans Outlook */}
+          <div className="mt-3">
             <WriteEmailLink contact={client.contact} />
-            <Button variant="secondary" onClick={onDetail}>
-              Détail
-            </Button>
           </div>
         </div>
         <CloseButton onClose={onClose} />
@@ -203,10 +200,10 @@ function PanelContent({ client, now, pending, onRelancer, onDetail, onClose }: P
             : `Relancer (${client.nbManquantes} pièce${client.nbManquantes > 1 ? 's' : ''})`}
         </Button>
         {/* Hors V1 : visible mais désactivé (spec, section 5) */}
-        <Button variant="secondary" disabled title="Bientôt" aria-describedby="assigner-bientot">
-          Assigner
+        {/* « Détail » à la place d'« Assigner » (choix d'Axel) : ouvre la page client, avec tout l'historique */}
+        <Button variant="secondary" onClick={onDetail}>
+          Détail
         </Button>
-        <span id="assigner-bientot" className="sr-only">Bientôt disponible</span>
       </footer>
     </>
   )

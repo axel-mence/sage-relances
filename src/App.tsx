@@ -1,4 +1,5 @@
 import { useLayoutEffect, useState } from 'react'
+import { KpisProvider } from './components/kpis-provider'
 import { Preloader } from './components/preloader'
 import { MobileTopBar, Sidebar } from './components/sidebar'
 import { clientSlugFromPath, historyState, isClientsPath, usePath } from './hooks/use-route'
@@ -85,7 +86,11 @@ function Page({ path }: { path: string }) {
   if (path === '/onboarding/sage/autoriser') return <SageAutoriser />
   if (path === '/onboarding/sage/import') return <SageImport />
 
-  return <Shell />
+  return (
+    <KpisProvider>
+      <Shell />
+    </KpisProvider>
+  )
 }
 
 // Le preloader ne se joue qu'une fois par session (onglet) : pas à chaque rechargement

@@ -45,24 +45,27 @@
   --ds-status-relancee-bg: #f1fad0;
 }
 
-/* Mode sombre : côté cabinet */
+/*
+  Mode sombre : côté cabinet. DS Nudge v2, mise à jour « dark mode v2 » (référence Higgsfield) :
+  anthracite légèrement teinté de vert au lieu du quasi-noir, pour que les surfaces se détachent.
+*/
 .theme-dark {
   color-scheme: dark;
 
-  --ds-page: #090b0b;
-  --ds-surface: #131716;
-  --ds-surface-2: #1c2221;
+  --ds-page: #121716;
+  --ds-surface: #1a201f;
+  --ds-surface-2: #232b29;
   --ds-inverse: #f2f4ee;
-  --ds-border: #252c2b;
+  --ds-border: #2e3836;
 
   --ds-primary: #f2f4ee;
   --ds-secondary: #b4bcb8;
   --ds-muted: #8a938f;
-  --ds-on-inverse: #090b0b;
+  --ds-on-inverse: #121716;
 
   --ds-accent: #d4f53c;
   --ds-accent-hover: #c2e62a;
-  --ds-accent-on: #090b0b;
+  --ds-accent-on: #121716;
   --ds-accent-subtle: #2a3312;
 
   --ds-status-recue: #3de86b;
@@ -170,10 +173,11 @@
 
 /* Fond sombre en dégradé (hero, barre latérale, connexion côté cabinet) : noir profond + halo vert émeraude */
 @utility bg-nudge-dark {
+  /* Vert adouci (demande d'Axel) : opacités des halos réduites d'environ 40 % */
   background:
-    radial-gradient(35% 45% at 100% 35%, rgba(61, 232, 107, 0.12), transparent 100%),
-    radial-gradient(45% 50% at 5% 0%, rgba(26, 92, 69, 0.55), transparent 100%),
-    radial-gradient(75% 85% at 50% 105%, rgba(31, 122, 87, 0.95) 0%, rgba(18, 74, 54, 0.6) 45%, transparent 100%),
+    radial-gradient(35% 45% at 100% 35%, rgba(61, 232, 107, 0.07), transparent 100%),
+    radial-gradient(45% 50% at 5% 0%, rgba(26, 92, 69, 0.32), transparent 100%),
+    radial-gradient(75% 85% at 50% 105%, rgba(31, 122, 87, 0.55) 0%, rgba(18, 74, 54, 0.35) 45%, transparent 100%),
     #050807;
 }
 

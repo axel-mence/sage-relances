@@ -112,8 +112,8 @@ function ClientContent({ client, now, pending, onRelancer, topBar }: ClientConte
     <div className="flex flex-col gap-6 lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_auto_minmax(0,1fr)] lg:gap-x-6 lg:gap-y-5 xl:grid-cols-[minmax(0,1fr)_22rem] xl:gap-x-8">
       <div className="lg:col-start-1 lg:row-start-1">{topBar}</div>
 
-      {/* En-tête : nom, statut et échéance à gauche, actions à droite (référence Attio « Compose Email ») */}
-      <header className="flex flex-col gap-4 lg:col-start-1 lg:row-start-2 xl:flex-row xl:items-end xl:justify-between">
+      {/* En-tête : nom, statut et échéance (les actions sont sous la carte de détails, à droite) */}
+      <header className="flex flex-col gap-4 lg:col-start-1 lg:row-start-2">
         <div className="flex min-w-0 flex-col gap-2">
           <div className="flex flex-wrap items-center gap-3">
             <h1 ref={titleRef} tabIndex={-1} className="font-display text-title outline-none">
@@ -124,16 +124,6 @@ function ClientContent({ client, now, pending, onRelancer, topBar }: ClientConte
           <p className={`text-label ${echeanceEnRouge ? 'text-status-retard' : 'text-secondary'}`}>
             Échéance le {formatJourMois(new Date(`${client.echeance}T00:00:00`))} · {echeance}
           </p>
-        </div>
-
-        {/* Sur mobile, les 2 actions se partagent la largeur, « Relancer » plus large */}
-        <div className="flex gap-3 *:flex-1 sm:*:flex-none [&>*:last-child]:flex-[2] sm:[&>*:last-child]:flex-none">
-          <WriteEmailLink contact={client.contact} />
-          <Button disabled={client.nbManquantes === 0} loading={pending} onClick={() => onRelancer(client)}>
-            {client.nbManquantes === 0
-              ? 'Rien à relancer'
-              : `Relancer (${client.nbManquantes} pièce${client.nbManquantes > 1 ? 's' : ''})`}
-          </Button>
         </div>
       </header>
 
@@ -146,7 +136,18 @@ function ClientContent({ client, now, pending, onRelancer, topBar }: ClientConte
         // Alignée sur le nom du client (ligne 2) dès 720 px de haut ; plus bas, elle remonte en haut pour tenir entière
         className="lg:col-start-2 lg:row-span-3 lg:row-start-1 lg:max-h-full lg:self-start lg:overflow-y-auto lg:[@media(min-height:45rem)]:row-span-2 lg:[@media(min-height:45rem)]:row-start-2"
       >
-        <ClientDetails client={client} now={now} />
+        <div className="flex flex-col gap-4">
+          <ClientDetails client={client} now={now} />
+          {/* Actions sous la carte du client (demande d'Axel) : « Relancer » prend plus de place */}
+          <div className="flex gap-3 *:flex-1 [&>*:last-child]:flex-[2]">
+            <WriteEmailLink contact={client.contact} />
+            <Button disabled={client.nbManquantes === 0} loading={pending} onClick={() => onRelancer(client)}>
+              {client.nbManquantes === 0
+                ? 'Rien à relancer'
+                : `Relancer (${client.nbManquantes} pièce${client.nbManquantes > 1 ? 's' : ''})`}
+            </Button>
+          </div>
+        </div>
       </aside>
 
       <section aria-label="Historique" className="lg:col-start-1 lg:row-start-3 lg:min-h-0">
