@@ -3,7 +3,7 @@
 > Version 1.1 · 21/11/2026 · Auteur : Axel Mencé
 > 1.1 : le panneau latéral reste sur le tableau de bord, la page client devient une page à part (annuaire « Clients »). Décision d'Axel après l'étape 4.
 > Complète [spec.md](spec.md) (tableau de bord, règle de statut, DS). En cas de doute sur ces 2 features, ce fichier fait foi.
-> Références retenues : [refs-clients-relances/CONTEXTE.md](refs-clients-relances/CONTEXTE.md).
+> Références retenues : [references/refs-clients-relances/CONTEXTE.md](references/refs-clients-relances/CONTEXTE.md) (dossier local, hors du dépôt).
 > Cas fictif : cabinet, clients, contacts et chiffres inventés. Aucun mail réel n'est envoyé.
 
 ---
