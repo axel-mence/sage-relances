@@ -59,7 +59,7 @@ src/
 
 ## Itération UX/UI (DS v2)
 
-Source : `ameliorations-ui-ux/ameliorations-ui-ux.md` (captures dans `captures/`).
+Source : `references/ameliorations-ui-ux/ameliorations-ui-ux.md` (captures dans `captures/`). Le dossier `references/` (briefs, captures, zips) reste en local, hors du dépôt.
 
 - Les « Notes d'Axel » (N1, N2, N3) font foi. Si une note contredit `spec.md` ou une autre règle, le signaler au lieu de choisir seul.
 - Ouvrir les captures avant d'implémenter : reproduire le principe, pas le style de l'app d'origine (le DS du projet fait foi).
