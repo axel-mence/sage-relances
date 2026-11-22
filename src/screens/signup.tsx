@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { creerCompte, type MethodeConnexion } from '../api/auth-api'
+import { CompteExistant, creerCompte, type MethodeConnexion } from '../api/auth-api'
 import { AuthLayout } from '../components/auth-layout'
 import { CHAMP, IconeCoche, LienInterne, LogoGoogle, LogoSage, SeparateurOu } from '../components/auth-ui'
 import { Button } from '../components/button'
@@ -16,17 +16,26 @@ const ARGUMENTS = ["14 jours d'essai", 'Sans carte bancaire', 'Connecté à Sage
 */
 export function Signup() {
   const [enCours, setEnCours] = useState<MethodeConnexion | null>(null)
+  const [erreur, setErreur] = useState<string | null>(null)
 
-  async function inscrire(methode: MethodeConnexion, email?: string) {
+  // Le compte est créé (et la session ouverte) dès cette étape ; le code et le cabinet le complètent
+  async function inscrire(methode: MethodeConnexion, email?: string, motDePasse?: string) {
     setEnCours(methode)
-    await creerCompte(methode)
-    if (methode === 'email') navigate('/inscription/code', { email })
-    else navigate('/inscription/cabinet')
+    setErreur(null)
+    try {
+      await creerCompte(methode, email, motDePasse)
+      if (methode === 'email') navigate('/inscription/code', { email }, { replace: true })
+      else navigate('/inscription/cabinet', {}, { replace: true })
+    } catch (error) {
+      setErreur(error instanceof CompteExistant ? error.message : 'Inscription impossible. Réessayez.')
+      setEnCours(null)
+    }
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    inscrire('email', String(new FormData(event.currentTarget).get('email') ?? ''))
+    const form = new FormData(event.currentTarget)
+    inscrire('email', String(form.get('email') ?? ''), String(form.get('mot-de-passe') ?? ''))
   }
 
   return (
@@ -70,6 +79,11 @@ export function Signup() {
               8 caractères minimum.
             </p>
           </div>
+          {erreur && (
+            <p role="alert" className="text-label text-status-retard">
+              {erreur}
+            </p>
+          )}
           <Button type="submit" variant="secondary" className="w-full" loading={enCours === 'email'}>
             Créer mon compte
           </Button>

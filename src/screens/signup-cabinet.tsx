@@ -4,6 +4,7 @@ import { AuthLayout } from '../components/auth-layout'
 import { CHAMP } from '../components/auth-ui'
 import { Button } from '../components/button'
 import { navigate } from '../hooks/use-route'
+import { useSession } from '../hooks/use-session'
 import { Arguments } from './signup'
 
 const TAILLES = ['Moins de 50', '50 à 200', '200 à 500', 'Plus de 500']
@@ -14,35 +15,45 @@ const ROLES: { value: Cabinet['role']; label: string }[] = [
 ]
 
 /*
-  Étape 3 de l'inscription : « Votre cabinet » (nom, nombre de dossiers clients, rôle).
+  Étape 3 de l'inscription : « Votre cabinet » (votre nom, nom du cabinet, nombre de dossiers, rôle).
+  Enregistré dans le compte : le nom et le rôle s'affichent ensuite en bas de la barre latérale.
   Ensuite : connexion du logiciel comptable Sage (écran de choix du logiciel).
 */
 export function SignupCabinet() {
   const [enCours, setEnCours] = useState(false)
+  const compte = useSession()
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = new FormData(event.currentTarget)
     setEnCours(true)
     await enregistrerCabinet({
-      nom: String(form.get('nom') ?? ''),
+      nom: String(form.get('nom') ?? '').trim(),
+      cabinet: String(form.get('cabinet') ?? '').trim(),
       dossiers: String(form.get('dossiers') ?? ''),
       role: form.get('role') as Cabinet['role'],
     })
-    navigate('/onboarding/sage')
+    navigate('/onboarding/sage', {}, { replace: true })
   }
 
   return (
     <AuthLayout title="Votre cabinet" aside={<Arguments />}>
-      <p className="-mt-4 text-secondary">Trois informations pour préparer vos relances.</p>
+      <p className="-mt-4 text-secondary">Quelques informations pour préparer vos relances.</p>
 
       <form onSubmit={onSubmit}>
         <fieldset disabled={enCours} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <label htmlFor="nom" className="text-label">
+              Votre nom
+            </label>
+            <input id="nom" name="nom" required autoComplete="name" defaultValue={compte?.nom} placeholder="Prénom Nom" className={CHAMP} />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="cabinet" className="text-label">
               Nom du cabinet
             </label>
-            <input id="nom" name="nom" required autoComplete="organization" className={CHAMP} />
+            <input id="cabinet" name="cabinet" required autoComplete="organization" defaultValue={compte?.cabinet} className={CHAMP} />
           </div>
 
           <div className="flex flex-col gap-2">

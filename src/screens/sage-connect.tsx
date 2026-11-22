@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { autoriserSage } from '../api/auth-api'
+import { autoriserSage, marquerSageConnecte } from '../api/auth-api'
 import { TOTAL_DOSSIERS_CABINET } from '../api/clients-api'
 import { AuthLayout } from '../components/auth-layout'
 import { IconeCoche, LienInterne, LogoSage } from '../components/auth-ui'
@@ -7,6 +7,7 @@ import { Button } from '../components/button'
 import { NudgeLogo } from '../components/nudge-logo'
 import { Toasts } from '../components/toasts'
 import { historyState, navigate } from '../hooks/use-route'
+import { useSession } from '../hooks/use-session'
 import { useToasts } from '../hooks/use-toasts'
 import { Arguments } from './signup'
 
@@ -28,16 +29,18 @@ const DROITS = ['Lire la liste des pièces attendues', 'Lire les pièces reçues
 export function SageChoix() {
   const [retour] = useState(() => historyState().sage)
   const { toasts, show, dismiss } = useToasts()
-  const connecte = retour === 'connecte'
+  const compte = useSession()
+  // Connecté : retour d'import réussi, ou compte déjà relié à Sage
+  const connecte = retour === 'connecte' || compte?.sage === true
   // Le toast ne doit partir qu'une fois (React rejoue les effets 2 fois en développement)
   const toastAffiche = useRef(false)
 
   // Retour d'un import réussi : on le confirme par un toast
   useEffect(() => {
-    if (!connecte || toastAffiche.current) return
+    if (retour !== 'connecte' || toastAffiche.current) return
     toastAffiche.current = true
     show(`Sage est connecté. ${TOTAL_DOSSIERS_CABINET} dossiers importés.`)
-  }, [connecte, show])
+  }, [retour, show])
 
   return (
     <AuthLayout title="Connectez votre logiciel comptable" aside={<Arguments />}>
@@ -84,11 +87,11 @@ export function SageChoix() {
       </ul>
 
       {connecte ? (
-        <Button className="w-full" onClick={() => navigate('/', { invitation: true })}>
+        <Button className="w-full" onClick={() => navigate('/', { invitation: true, preloader: true }, { replace: true })}>
           Accéder au tableau de bord
         </Button>
       ) : (
-        <LienInterne href="/" state={{ invitation: true }} className="text-center text-label text-secondary hover:text-primary">
+        <LienInterne href="/" state={{ invitation: true, preloader: true }} className="text-center text-label text-secondary hover:text-primary">
           Passer cette étape
         </LienInterne>
       )}
@@ -189,7 +192,10 @@ export function SageImport() {
   // Import terminé : petite pause pour lire le total, puis retour sur le choix avec « Connecté »
   useEffect(() => {
     if (importes < TOTAL_DOSSIERS_CABINET) return
-    const fin = window.setTimeout(() => navigate('/onboarding/sage', { sage: 'connecte' }, { replace: true }), 600)
+    const fin = window.setTimeout(() => {
+      marquerSageConnecte(true)
+      navigate('/onboarding/sage', { sage: 'connecte' }, { replace: true })
+    }, 600)
     return () => window.clearTimeout(fin)
   }, [importes])
 

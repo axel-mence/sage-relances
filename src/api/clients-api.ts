@@ -11,6 +11,7 @@
   Les données vivent en mémoire pendant la session : un rechargement de page repart du JSON.
 */
 import rawData from '../data/clients.json'
+import { compteConnecte } from './auth-api'
 import { composeRelance, type MailRelance } from '../domain/mail'
 import { slugify } from '../domain/slug'
 import { computeStatus, derniereRelance, piecesManquantes } from '../domain/status'
@@ -37,7 +38,7 @@ const FACTEUR_CABINET = TOTAL_DOSSIERS_CABINET / 24
 // Hypothèse de temps gagné par relance faite en un clic au lieu d'un mail rédigé à la main
 export const MINUTES_GAGNEES_PAR_RELANCE = 10
 
-// Personne connectée (pas d'authentification en V1)
+// Utilisateur de démo : signe les relances quand le compte connecté n'a pas encore de nom
 export const UTILISATEUR_CONNECTE = 'Claire Lemoine'
 // Cabinet fictif : affiché dans la barre latérale et en signature des mails de relance
 export const NOM_CABINET = 'Cabinet Lemoine'
@@ -212,7 +213,8 @@ export function createApi({
         client.relances.push({
           id: `${client.id}-r-new${compteurRelance}`,
           date: now().toISOString(),
-          par: UTILISATEUR_CONNECTE,
+          // Relance signée par le compte connecté (nom saisi à l'inscription), sinon par l'utilisateur de démo
+          par: compteConnecte()?.nom || UTILISATEUR_CONNECTE,
           pieces: manquantes.map((p) => p.id),
           canal: 'mail',
           mode: 'manuelle',

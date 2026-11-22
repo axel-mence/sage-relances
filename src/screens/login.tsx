@@ -8,7 +8,9 @@ import { navigate } from '../hooks/use-route'
 /*
   Écran de connexion (refs-auth/connexion, base Lovable) :
   Sage d'abord, puis Google, séparateur « ou », email + mot de passe.
-  Badge « Dernière méthode utilisée » sur la méthode précédente. Tout est simulé (api/auth-api).
+  Badge « Dernière méthode utilisée » sur la méthode précédente.
+  Email + mot de passe : vérifiés sur les comptes créés à l'inscription (api/auth-api). Sage et Google : fictifs.
+  Connexion réussie : écran de chargement, puis le tableau de bord.
 */
 export function Login() {
   const [enCours, setEnCours] = useState<MethodeConnexion | null>(null)
@@ -16,12 +18,12 @@ export function Login() {
   const [aideMotDePasse, setAideMotDePasse] = useState(false)
   const [precedente] = useState(derniereMethode)
 
-  async function connecter(methode: MethodeConnexion, motDePasse?: string) {
+  async function connecter(methode: MethodeConnexion, email?: string, motDePasse?: string) {
     setEnCours(methode)
     setErreur(null)
     try {
-      await seConnecter(methode, motDePasse)
-      navigate('/')
+      await seConnecter(methode, email, motDePasse)
+      navigate('/', { preloader: true }, { replace: true })
     } catch (error) {
       setErreur(error instanceof IdentifiantsIncorrects ? error.message : 'Connexion impossible. Réessayez.')
       setEnCours(null)
@@ -30,8 +32,8 @@ export function Login() {
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const motDePasse = new FormData(event.currentTarget).get('mot-de-passe')
-    connecter('email', String(motDePasse ?? ''))
+    const form = new FormData(event.currentTarget)
+    connecter('email', String(form.get('email') ?? ''), String(form.get('mot-de-passe') ?? ''))
   }
 
   return (
