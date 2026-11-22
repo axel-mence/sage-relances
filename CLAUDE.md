@@ -7,7 +7,8 @@ Complète le `CLAUDE.md` global d'Axel. Specs de référence : [spec.md](spec.md
 - Feature : tableau de bord associé pour suivre les pièces manquantes des clients d'un cabinet comptable et les relancer en un clic.
 - Cas pratique fictif : cabinet, clients et chiffres inventés. Aucune donnée réelle.
 - Pages : tableau de bord `/` (aperçu client en panneau latéral), annuaire `/clients`, page client `/clients/:slug`. Relances (séquence automatique) : partie 2 de spec-clients-relances, à venir.
-- Avant le tableau de bord (refs-auth, tout simulé) : preloader 3D au lancement (une fois par session, `/test/preloader` pour le rejouer), connexion `/connexion`, inscription `/inscription` → `/inscription/code` → `/inscription/cabinet`, connexion Sage `/onboarding/sage` → `/autoriser` → `/import`, puis modale d'invitation sur le tableau de bord. Démo : mot de passe de moins de 8 caractères refusé, code `000000` expiré.
+- Comptes (sans serveur) : inscription `/inscription` → `/inscription/code` → `/inscription/cabinet` → connexion Sage `/onboarding/sage` → modale d'invitation. Comptes et session dans le navigateur (localStorage), mot de passe stocké en empreinte SHA-256. Sans session, toute adresse ramène à `/connexion` ; après connexion, écran de chargement (preloader) puis le SaaS. Sage et Google ouvrent un compte de démo. Démo : code `000000` expiré. `/test/preloader` rejoue le preloader.
+- Paramètres `/parametres` : compte, logiciel comptable (Sage) et boîte mail (Outlook, Gmail). Connecteurs fictifs : ils ne font que basculer l'état « Connecté » du compte.
 
 ## Stack
 
