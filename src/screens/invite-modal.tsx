@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { inviterCollaborateurs } from '../api/auth-api'
+import { compteConnecte, inviterCollaborateurs, marquerInvitationFaite } from '../api/auth-api'
 import { Button } from '../components/button'
 import { Toasts } from '../components/toasts'
 import { historyState, navigate } from '../hooks/use-route'
@@ -28,7 +28,8 @@ const EMAIL_VALIDE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 */
 export function InviteModal() {
   // Ouverte seulement si on arrive de l'onboarding (état transmis par l'historique)
-  const [ouverte, setOuverte] = useState(() => historyState().invitation === true)
+  // et une seule fois par compte (pas à chaque reconnexion qui repasse par la connexion Sage)
+  const [ouverte, setOuverte] = useState(() => historyState().invitation === true && !compteConnecte()?.invitationFaite)
   const [dialog, setDialog] = useState<HTMLDialogElement | null>(null)
   const [choix, setChoix] = useState<Choix>('maintenant')
   const [saisie, setSaisie] = useState('')
@@ -42,6 +43,7 @@ export function InviteModal() {
 
   // Ferme la modale et retire l'état de l'historique : un rechargement ne la rouvre pas
   function fermer() {
+    marquerInvitationFaite()
     dialog?.close()
     setOuverte(false)
     navigate('/', { ...historyState(), invitation: undefined }, { replace: true })

@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { derniereMethode, IdentifiantsIncorrects, seConnecter, type MethodeConnexion } from '../api/auth-api'
 import { AuthLayout } from '../components/auth-layout'
-import { AvecBadge, CHAMP, IconeCoche, LienInterne, LogoGoogle, LogoSage, SeparateurOu } from '../components/auth-ui'
+import { AvecBadge, BoutonsSsoBientot, CHAMP, IconeCoche, LienInterne, SeparateurOu } from '../components/auth-ui'
 import { Button } from '../components/button'
 import { navigate } from '../hooks/use-route'
 
@@ -9,8 +9,11 @@ import { navigate } from '../hooks/use-route'
   Écran de connexion (refs-auth/connexion, base Lovable) :
   Sage d'abord, puis Google, séparateur « ou », email + mot de passe.
   Badge « Dernière méthode utilisée » sur la méthode précédente.
-  Email + mot de passe : vérifiés sur les comptes créés à l'inscription (api/auth-api). Sage et Google : fictifs.
-  Connexion réussie : écran de chargement, puis le tableau de bord.
+  Email + mot de passe : vérifiés sur les comptes créés à l'inscription (api/auth-api).
+  Sage et Google : « Bientôt », pour que le testeur crée un vrai compte.
+  Connexion réussie :
+  - compte pas encore relié à Sage : parcours de connexion Sage (autorisation, import des dossiers) ;
+  - sinon : écran de chargement, puis le tableau de bord.
 */
 export function Login() {
   const [enCours, setEnCours] = useState<MethodeConnexion | null>(null)
@@ -22,8 +25,9 @@ export function Login() {
     setEnCours(methode)
     setErreur(null)
     try {
-      await seConnecter(methode, email, motDePasse)
-      navigate('/', { preloader: true }, { replace: true })
+      const compte = await seConnecter(methode, email, motDePasse)
+      if (compte.sage) navigate('/', { preloader: true }, { replace: true })
+      else navigate('/onboarding/sage', {}, { replace: true })
     } catch (error) {
       setErreur(error instanceof IdentifiantsIncorrects ? error.message : 'Connexion impossible. Réessayez.')
       setEnCours(null)
@@ -40,20 +44,7 @@ export function Login() {
     <AuthLayout title="Connexion" aside={<CarteRelance />}>
       {/* fieldset désactivé pendant une connexion : tous les champs et boutons sont bloqués d'un coup */}
       <fieldset disabled={enCours !== null} className="flex flex-col gap-6">
-        <div className="flex flex-col gap-3">
-          <AvecBadge visible={precedente === 'sage'}>
-            <Button className="w-full" loading={enCours === 'sage'} onClick={() => connecter('sage')}>
-              <LogoSage />
-              Se connecter avec Sage
-            </Button>
-          </AvecBadge>
-          <AvecBadge visible={precedente === 'google'}>
-            <Button variant="secondary" className="w-full" loading={enCours === 'google'} onClick={() => connecter('google')}>
-              <LogoGoogle />
-              Continuer avec Google
-            </Button>
-          </AvecBadge>
-        </div>
+        <BoutonsSsoBientot verbe="Se connecter" />
 
         <SeparateurOu />
 
@@ -100,7 +91,7 @@ export function Login() {
           )}
 
           <AvecBadge visible={precedente === 'email'}>
-            <Button type="submit" variant="secondary" className="w-full" loading={enCours === 'email'}>
+            <Button type="submit" className="w-full" loading={enCours === 'email'}>
               Se connecter
             </Button>
           </AvecBadge>

@@ -24,6 +24,8 @@ export type Compte = {
   // Connecteurs, fictifs pour l'instant (écran Paramètres)
   sage: boolean
   boiteMail: BoiteMail | null
+  // Modale d'invitation déjà vue : elle n'est proposée qu'une fois par compte
+  invitationFaite?: boolean
 }
 
 export class IdentifiantsIncorrects extends Error {
@@ -226,6 +228,10 @@ export function marquerSageConnecte(connecte: boolean) {
 export async function connecterBoiteMail(boite: BoiteMail | null): Promise<void> {
   await attendre()
   modifierCompte({ boiteMail: boite })
+}
+
+export function marquerInvitationFaite() {
+  modifierCompte({ invitationFaite: true })
 }
 
 // Invitation des collaborateurs simulée (fin de l'onboarding)
