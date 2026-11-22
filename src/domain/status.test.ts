@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { computeStatus, niveauCompletude, tauxCompletude } from './status'
-import type { Client } from './types'
+import type { Client, Relance } from './types'
 
 const NOW = new Date('2026-11-20T12:00:00')
 
@@ -12,6 +12,7 @@ function makeClient(overrides: Partial<Client> = {}): Client {
     contact: { nom: 'Contact test', email: 'contact@test.fr' },
     collaborateurId: 'c1',
     regimeTva: 'mensuelle',
+    clientDepuis: '2020-01-01',
     echeance: '2026-11-25',
     pieces: [
       { id: 'p1', libelle: 'Relevé bancaire', statut: 'recue', recueLe: '2026-11-10' },
@@ -22,8 +23,17 @@ function makeClient(overrides: Partial<Client> = {}): Client {
   }
 }
 
-function relanceIlYa(heures: number) {
-  return { id: 'r', date: new Date(NOW.getTime() - heures * 3600_000).toISOString(), par: 'Test', pieces: ['p2'], canal: 'mail' as const }
+function relanceIlYa(heures: number): Relance {
+  return {
+    id: 'r',
+    date: new Date(NOW.getTime() - heures * 3600_000).toISOString(),
+    par: 'Test',
+    pieces: ['p2'],
+    canal: 'mail',
+    mode: 'manuelle',
+    objet: 'Objet test',
+    message: 'Message test',
+  }
 }
 
 describe('computeStatus', () => {

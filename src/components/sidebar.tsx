@@ -1,15 +1,27 @@
 import { NOM_CABINET, UTILISATEUR_CONNECTE } from '../api/clients-api'
+import { navigate } from '../hooks/use-route'
 import { Avatar } from './avatar'
 import { NavIcon, type NavIconName } from './nav-icon'
 import { NudgeLogo } from './nudge-logo'
 import { ThemeToggle } from './theme-toggle'
 
-type NavItem = { label: string; icon: NavIconName; active?: boolean }
+type NavItem = {
+  label: string
+  icon: NavIconName
+  // Adresse de la page ; sans adresse, l'entrée est inactive (« Bientôt »)
+  path?: string
+  // L'entrée est active sur ces adresses (« Clients » reste active sur les fiches)
+  match?: (path: string) => boolean
+}
 
-// Seul le tableau de bord existe en V1 : les autres entrées sont visibles mais inactives (spec, écran 01)
+/*
+  « Tableau de bord » : pièces manquantes et relance rapide (panneau à droite).
+  « Clients » : annuaire et pages clients (spec-clients-relances, partie 1).
+  « Relances » arrive avec la partie 2 : visible mais inactive.
+*/
 const MAIN_ITEMS: NavItem[] = [
-  { label: 'Tableau de bord', icon: 'home', active: true },
-  { label: 'Clients', icon: 'clients' },
+  { label: 'Tableau de bord', icon: 'home', path: '/', match: (path) => path === '/' },
+  { label: 'Clients', icon: 'clients', path: '/clients', match: (path) => path.startsWith('/clients') },
   { label: 'Relances', icon: 'relances' },
 ]
 
@@ -22,10 +34,21 @@ const FOOTER_ITEMS: NavItem[] = [
 // Base commune des lignes de navigation : picto + libellé, hauteur 40 px
 const ROW = 'flex h-10 items-center gap-3 rounded-sm px-3 text-body'
 
-function NavLink({ item }: { item: NavItem }) {
-  if (item.active) {
+function NavLink({ item, path }: { item: NavItem; path: string }) {
+  if (item.path) {
+    const target = item.path
+    const active = item.match?.(path) ?? false
     return (
-      <a href="/" aria-current="page" className={`${ROW} bg-accent-subtle font-medium text-accent`}>
+      <a
+        href={target}
+        aria-current={active ? 'page' : undefined}
+        // Navigation sans rechargement : les pages gardent leurs données
+        onClick={(event) => {
+          event.preventDefault()
+          navigate(target)
+        }}
+        className={`${ROW} ${active ? 'bg-accent-subtle font-medium text-accent' : 'text-secondary hover:bg-surface-2 hover:text-primary'}`}
+      >
         <NavIcon name={item.icon} />
         {item.label}
       </a>
@@ -40,12 +63,12 @@ function NavLink({ item }: { item: NavItem }) {
   )
 }
 
-function NavList({ items }: { items: NavItem[] }) {
+function NavList({ items, path }: { items: NavItem[]; path: string }) {
   return (
     <ul className="flex flex-col gap-1">
       {items.map((item) => (
         <li key={item.label}>
-          <NavLink item={item} />
+          <NavLink item={item} path={path} />
         </li>
       ))}
     </ul>
@@ -58,7 +81,7 @@ function NavList({ items }: { items: NavItem[] }) {
   puis le bloc utilisateur. Collée en haut (sticky) et haute d'un écran exactement :
   elle ne défile jamais avec la page, et le bloc utilisateur reste toujours visible en bas.
 */
-export function Sidebar() {
+export function Sidebar({ path }: { path: string }) {
   return (
     <aside className="bg-nudge-light dark:bg-nudge-dark sticky top-0 hidden h-dvh w-60 shrink-0 flex-col overflow-y-auto border-r border-border lg:flex">
       <div className="px-6 pt-6 pb-4">
@@ -67,7 +90,7 @@ export function Sidebar() {
 
       <nav aria-label="Navigation principale" className="flex flex-1 flex-col">
         <div className="px-3 pb-4">
-          <NavList items={MAIN_ITEMS} />
+          <NavList items={MAIN_ITEMS} path={path} />
         </div>
 
         {/* Section « Cabinet » séparée par des filets, comme « Projects » chez n8n */}
@@ -84,7 +107,7 @@ export function Sidebar() {
           <div className="px-3">
             <ThemeToggle />
           </div>
-          <NavList items={FOOTER_ITEMS} />
+          <NavList items={FOOTER_ITEMS} path={path} />
         </div>
       </nav>
 
@@ -101,20 +124,45 @@ export function Sidebar() {
   )
 }
 
-// Barre du haut sur mobile et tablette, à la place de la barre latérale
-export function MobileTopBar() {
+/*
+  Barre du haut sur mobile et tablette, à la place de la barre latérale.
+  Dessous, les 2 pages principales en onglets (Tableau de bord, Clients), pour y accéder sans menu.
+*/
+export function MobileTopBar({ path }: { path: string }) {
+  const pages = MAIN_ITEMS.filter((item) => item.path)
   return (
-    <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4 lg:hidden">
-      <div className="flex items-center gap-3">
-        <NudgeLogo variant="mark" className="h-7 text-accent" />
-        <span className="text-label text-primary">{NOM_CABINET}</span>
+    <header className="border-b border-border bg-surface lg:hidden">
+      <div className="flex h-14 items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          <NudgeLogo variant="mark" className="h-7 text-accent" />
+          <span className="text-label text-primary">{NOM_CABINET}</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <ThemeToggle compact />
+          {/* Sur mobile, l'avatar seul : le nom est lu grâce au texte masqué */}
+          <span className="sr-only">{UTILISATEUR_CONNECTE}</span>
+          <Avatar size="sm" />
+        </div>
       </div>
-      <div className="flex items-center gap-3">
-        <ThemeToggle compact />
-        {/* Sur mobile, l'avatar seul : le nom est lu grâce au texte masqué */}
-        <span className="sr-only">{UTILISATEUR_CONNECTE}</span>
-        <Avatar size="sm" />
-      </div>
+      <nav aria-label="Navigation principale" className="flex gap-6 px-4">
+        {pages.map((item) => {
+          const active = item.match?.(path) ?? false
+          return (
+            <a
+              key={item.label}
+              href={item.path}
+              aria-current={active ? 'page' : undefined}
+              onClick={(event) => {
+                event.preventDefault()
+                navigate(item.path!)
+              }}
+              className={`-mb-px border-b-2 py-2.5 text-label ${active ? 'border-accent text-primary' : 'border-transparent text-secondary'}`}
+            >
+              {item.label}
+            </a>
+          )
+        })}
+      </nav>
     </header>
   )
 }

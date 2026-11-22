@@ -1,17 +1,12 @@
-import { formatJourMois, formatPeriode } from './format'
+import { de, formatJourMois, formatPeriode } from './format'
 import { piecesManquantes, toDateKey } from './status'
-import type { Client } from './types'
+import type { Client, PieceAttendue } from './types'
 
 // Mail de relance prêt à envoyer : le comptable peut encore modifier l'objet et le message
 export interface MailRelance {
   destinataire: string // « Marc Peyrot <marc@garage-peyrot.fr> »
   objet: string
   message: string
-}
-
-// « de » élidé devant une voyelle : « d'octobre 2026 », « de novembre 2026 »
-function de(mot: string) {
-  return /^[aeiouyéèêàâîôû]/i.test(mot) ? `d'${mot}` : `de ${mot}`
 }
 
 type Signature = {
@@ -23,10 +18,15 @@ type Signature = {
 /*
   Rédige le mail de relance d'un client à partir de ses pièces manquantes.
   Le ton change si l'échéance est déjà passée (« au plus vite » au lieu de « avant le … »).
+  « pieces » permet de reconstituer une relance passée : les pièces qui manquaient ce jour-là.
 */
-export function composeRelance(client: Client, now: Date, { collaborateur, cabinet }: Signature): MailRelance {
+export function composeRelance(
+  client: Client,
+  now: Date,
+  { collaborateur, cabinet }: Signature,
+  manquantes: PieceAttendue[] = piecesManquantes(client),
+): MailRelance {
   const periode = formatPeriode(now)
-  const manquantes = piecesManquantes(client)
   const prenom = client.contact.nom.split(' ')[0]
   const pluriel = manquantes.length > 1
   const echeance = formatJourMois(new Date(`${client.echeance}T00:00:00`))

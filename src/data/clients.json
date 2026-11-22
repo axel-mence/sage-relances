@@ -36,6 +36,7 @@
       },
       "collaborateurId": "c1",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2019-03-01",
       "echeance": "2026-11-18",
       "pieces": [
         {
@@ -76,7 +77,8 @@
             "cl01-p4",
             "cl01-p5"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         }
       ]
     },
@@ -89,6 +91,7 @@
       },
       "collaborateurId": "c2",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2021-09-01",
       "echeance": "2026-11-15",
       "pieces": [
         {
@@ -125,6 +128,7 @@
       },
       "collaborateurId": "c3",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2023-01-15",
       "echeance": "2026-11-19",
       "pieces": [
         {
@@ -153,7 +157,8 @@
           "pieces": [
             "cl03-p3"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "automatique"
         }
       ]
     },
@@ -166,6 +171,7 @@
       },
       "collaborateurId": "c4",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2017-06-01",
       "echeance": "2026-11-17",
       "pieces": [
         {
@@ -212,7 +218,8 @@
             "cl04-p5",
             "cl04-p6"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         },
         {
           "id": "cl04-r2",
@@ -224,7 +231,8 @@
             "cl04-p5",
             "cl04-p6"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         }
       ]
     },
@@ -237,6 +245,7 @@
       },
       "collaborateurId": "c5",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2016-01-04",
       "echeance": "2026-11-12",
       "pieces": [
         {
@@ -277,7 +286,8 @@
             "cl05-p4",
             "cl05-p5"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         }
       ]
     },
@@ -290,6 +300,7 @@
       },
       "collaborateurId": "c6",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2024-02-01",
       "echeance": "2026-11-19",
       "pieces": [
         {
@@ -327,6 +338,7 @@
       },
       "collaborateurId": "c1",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2020-10-01",
       "echeance": "2026-11-24",
       "pieces": [
         {
@@ -363,6 +375,7 @@
       },
       "collaborateurId": "c2",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2022-05-02",
       "echeance": "2026-11-24",
       "pieces": [
         {
@@ -391,7 +404,8 @@
           "pieces": [
             "cl08-p3"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         }
       ]
     },
@@ -404,6 +418,7 @@
       },
       "collaborateurId": "c3",
       "regimeTva": "trimestrielle",
+      "clientDepuis": "2018-11-05",
       "echeance": "2026-11-30",
       "pieces": [
         {
@@ -439,6 +454,7 @@
       },
       "collaborateurId": "c4",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2021-01-11",
       "echeance": "2026-11-26",
       "pieces": [
         {
@@ -482,6 +498,7 @@
       },
       "collaborateurId": "c5",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2017-09-04",
       "echeance": "2026-11-24",
       "pieces": [
         {
@@ -522,7 +539,8 @@
             "cl11-p4",
             "cl11-p5"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "automatique"
         }
       ]
     },
@@ -535,6 +553,7 @@
       },
       "collaborateurId": "c6",
       "regimeTva": "trimestrielle",
+      "clientDepuis": "2025-01-06",
       "echeance": "2026-12-10",
       "pieces": [
         {
@@ -572,6 +591,7 @@
       },
       "collaborateurId": "c1",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2023-06-01",
       "echeance": "2026-11-26",
       "pieces": [
         {
@@ -602,6 +622,7 @@
       },
       "collaborateurId": "c2",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2019-07-01",
       "echeance": "2026-11-19",
       "pieces": [
         {
@@ -642,7 +663,8 @@
             "cl14-p4",
             "cl14-p5"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         },
         {
           "id": "cl14-r2",
@@ -652,7 +674,8 @@
             "cl14-p4",
             "cl14-p5"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         }
       ]
     },
@@ -665,6 +688,7 @@
       },
       "collaborateurId": "c3",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2020-02-03",
       "echeance": "2026-11-24",
       "pieces": [
         {
@@ -693,7 +717,8 @@
           "pieces": [
             "cl15-p3"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         }
       ]
     },
@@ -706,6 +731,7 @@
       },
       "collaborateurId": "c4",
       "regimeTva": "trimestrielle",
+      "clientDepuis": "2022-09-05",
       "echeance": "2026-11-30",
       "pieces": [
         {
@@ -740,7 +766,8 @@
             "cl16-p3",
             "cl16-p4"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "automatique"
         }
       ]
     },
@@ -753,6 +780,7 @@
       },
       "collaborateurId": "c5",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2018-04-03",
       "echeance": "2026-11-24",
       "pieces": [
         {
@@ -791,6 +819,7 @@
       },
       "collaborateurId": "c6",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2016-09-01",
       "echeance": "2026-11-18",
       "pieces": [
         {
@@ -832,7 +861,8 @@
           "pieces": [
             "cl18-p5"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         }
       ]
     },
@@ -845,6 +875,7 @@
       },
       "collaborateurId": "c1",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2021-04-06",
       "echeance": "2026-11-26",
       "pieces": [
         {
@@ -883,6 +914,7 @@
       },
       "collaborateurId": "c2",
       "regimeTva": "trimestrielle",
+      "clientDepuis": "2024-09-02",
       "echeance": "2026-11-30",
       "pieces": [
         {
@@ -915,6 +947,7 @@
       },
       "collaborateurId": "c3",
       "regimeTva": "trimestrielle",
+      "clientDepuis": "2020-06-02",
       "echeance": "2026-12-10",
       "pieces": [
         {
@@ -947,6 +980,7 @@
       },
       "collaborateurId": "c4",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2017-03-01",
       "echeance": "2026-11-24",
       "pieces": [
         {
@@ -994,7 +1028,8 @@
           "pieces": [
             "cl22-p6"
           ],
-          "canal": "mail"
+          "canal": "mail",
+          "mode": "manuelle"
         }
       ]
     },
@@ -1007,6 +1042,7 @@
       },
       "collaborateurId": "c5",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2023-10-02",
       "echeance": "2026-11-26",
       "pieces": [
         {
@@ -1045,6 +1081,7 @@
       },
       "collaborateurId": "c6",
       "regimeTva": "mensuelle",
+      "clientDepuis": "2025-03-03",
       "echeance": "2026-11-19",
       "pieces": [
         {

@@ -24,6 +24,11 @@ export interface Relance {
   par: string // nom de la personne ou "Système"
   pieces: string[] // ids des pièces concernées
   canal: 'mail'
+  mode: 'manuelle' | 'automatique'
+  etape?: string // « J+3 » pour une relance de séquence automatique (feature Relances)
+  // Contenu du mail réellement envoyé (retouches comprises), pour « Voir le mail »
+  objet: string
+  message: string
 }
 
 // Interlocuteur côté client (gérant ou responsable administratif), destinataire des relances
@@ -38,6 +43,7 @@ export interface Client {
   contact: Contact
   collaborateurId: string
   regimeTva: 'mensuelle' | 'trimestrielle'
+  clientDepuis: string // date ISO d'entrée au cabinet
   echeance: string // date ISO (AAAA-MM-JJ)
   pieces: PieceAttendue[]
   relances: Relance[]
@@ -45,6 +51,7 @@ export interface Client {
 
 // Client enrichi par l'API : ce que l'écran affiche directement
 export interface ClientView extends Client {
+  slug: string // « garage-peyrot » : adresse de la fiche (/clients/garage-peyrot)
   statut: DossierStatus
   collaborateur: string // nom du collaborateur
   nbManquantes: number

@@ -13,6 +13,7 @@ function makeClient(overrides: Partial<Client> = {}): Client {
     contact: { nom: 'Marc Peyrot', email: 'marc@garage-peyrot.fr' },
     collaborateurId: 'c2',
     regimeTva: 'mensuelle',
+    clientDepuis: '2020-01-01',
     echeance: '2026-11-25',
     pieces: [
       { id: 'p1', libelle: 'Relevé bancaire octobre', statut: 'recue', recueLe: '2026-11-10' },

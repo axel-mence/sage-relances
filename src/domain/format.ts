@@ -6,6 +6,11 @@ export const JOUR_ECHEANCE_TVA = 24
 const moisAnnee = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' })
 const jourMois = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' })
 
+// « de » élidé devant une voyelle : « d'octobre 2026 », « de novembre 2026 »
+export function de(mot: string): string {
+  return /^[aeiouyéèêàâîôû]/i.test(mot) ? `d'${mot}` : `de ${mot}`
+}
+
 // Les pièces suivies sont celles du mois précédent : « octobre 2026 » si on est en novembre
 export function formatPeriode(now: Date): string {
   return moisAnnee.format(new Date(now.getFullYear(), now.getMonth() - 1, 1))
@@ -17,8 +22,9 @@ export function prochaineEcheanceTva(now: Date): Date {
   return now.getDate() <= JOUR_ECHEANCE_TVA ? ceMois : new Date(now.getFullYear(), now.getMonth() + 1, JOUR_ECHEANCE_TVA)
 }
 
+// « 18 novembre », et « 1er novembre » pour le premier du mois (règle typographique française)
 export function formatJourMois(date: Date): string {
-  return jourMois.format(date)
+  return jourMois.format(date).replace(/^1 /, '1er ')
 }
 
 const jourMoisCourt = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' })
@@ -58,10 +64,15 @@ export function formatRelatif(isoDate: string | undefined, now: Date): string {
   return jours === 1 ? 'Hier' : `Il y a ${jours} jours`
 }
 
+// « Relevé bancaire octobre » → « Relevé bancaire » : quand le mois est déjà affiché au-dessus
+export function sansMois(libelle: string): string {
+  return libelle.replace(/\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)$/i, '')
+}
+
 // Résumé des pièces manquantes pour une ligne : « Relevé bancaire, Factures d'achat +1 »
 export function resumePieces(libelles: string[], max = 2): string {
   // Le mois est déjà dans l'en-tête : on le retire pour gagner de la place
-  const courts = libelles.map((l) => l.replace(/\s+(janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)$/i, ''))
+  const courts = libelles.map(sansMois)
   const reste = courts.length - max
   return courts.slice(0, max).join(', ') + (reste > 0 ? ` +${reste}` : '')
 }

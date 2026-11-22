@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ApiError, createApi } from './clients-api'
+import { ApiError, ClientIntrouvable, createApi } from './clients-api'
 
 // Date de référence du jeu de données, à midi : aucun décalage de dates
 const NOW = new Date('2026-11-20T12:00:00')
@@ -61,6 +61,30 @@ describe('API simulée', () => {
     // La relance est bien conservée côté « serveur »
     const relu = await api.getClient(client.id)
     expect(relu.statut).toBe('relancee')
+  })
+
+  it('enregistre le texte retouché de la relance, sinon le mail par défaut', async () => {
+    const api = testApi()
+    const [a, b] = await api.getClients('en_retard')
+
+    const retouche = await api.postRelance(a.id, { objet: 'Objet modifié', message: 'Message modifié' })
+    expect(retouche.relances.at(-1)).toMatchObject({ objet: 'Objet modifié', message: 'Message modifié', mode: 'manuelle' })
+
+    const parDefaut = await api.postRelance(b.id)
+    expect(parDefaut.relances.at(-1)?.objet).toBe('Pièces manquantes · TVA octobre 2026')
+  })
+
+  it('reconstitue le mail des relances passées du jeu de données', async () => {
+    const clients = await testApi().getClients()
+    const relances = clients.flatMap((c) => c.relances)
+    expect(relances.length).toBeGreaterThan(0)
+    expect(relances.every((r) => r.objet.startsWith('Pièces manquantes') && r.message.startsWith('Bonjour'))).toBe(true)
+  })
+
+  it('retrouve un client par son adresse, et signale une adresse inconnue', async () => {
+    const api = testApi()
+    expect((await api.getClientBySlug('garage-peyrot')).nom).toBe('Garage Peyrot')
+    await expect(api.getClientBySlug('client-inconnu')).rejects.toBeInstanceOf(ClientIntrouvable)
   })
 
   it('refuse de relancer un dossier complet', async () => {
