@@ -3,6 +3,7 @@
 Exploration figée de Nudge : la liste des clients rangée en groupes de statut dépliables, au lieu de la table filtrable retenue pour la version finale.
 
 **Démo de la version B : [nudge-git-version-b-groupes-axel-mence.vercel.app](https://nudge-git-version-b-groupes-axel-mence.vercel.app)**
+
 **Version finale (version A) : [nudge-axel-mence.vercel.app](https://nudge-axel-mence.vercel.app)**, code sur la branche [`main`](https://github.com/axel-mence/sage-x-nudge-relance).
 
 > Cas pratique fictif : le cabinet, les clients et les chiffres sont inventés. Aucune donnée réelle.
