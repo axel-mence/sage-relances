@@ -2,6 +2,7 @@
 
 Exploration figée de Nudge : la liste des clients rangée en groupes de statut dépliables, au lieu de la table filtrable retenue pour la version finale.
 
+**Démo de la version B : [nudge-git-version-b-groupes-axel-mence.vercel.app](https://nudge-git-version-b-groupes-axel-mence.vercel.app)**
 **Version finale (version A) : [nudge-axel-mence.vercel.app](https://nudge-axel-mence.vercel.app)**, code sur la branche [`main`](https://github.com/axel-mence/sage-x-nudge-relance).
 
 > Cas pratique fictif : le cabinet, les clients et les chiffres sont inventés. Aucune donnée réelle.
@@ -26,7 +27,7 @@ La version A a été retenue : avec 24 clients et plus, une table filtrable se p
 - **Complétude** de chaque dossier.
 - **Boutons « Voir » et « Relancer »** sur chaque ligne, avec confirmation par toast.
 - **Aperçu client** dans un panneau latéral.
-- **Temps gagné** de la semaine dans la barre latérale.
+- **Temps gagné** de la semaine, en haut du tableau de bord.
 - **Design system Nudge v2**, modes clair et sombre.
 
 Elle s'arrête avant les étapes suivantes de la version A : pas de comptes ni de connexion (le tableau de bord s'ouvre directement), pas d'annuaire ni de fiche client, pas de parcours Sage ni de paramètres.
