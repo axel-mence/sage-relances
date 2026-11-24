@@ -6,6 +6,7 @@
     (calcul à sens unique, on ne peut pas retrouver le mot de passe à partir de l'empreinte).
   - La session (compte connecté) survit au rechargement de la page.
   - Sage et Google restent fictifs : ils ouvrent un compte de démo.
+  - Exception : le compte démo de revue est vérifié côté serveur (voir connexionCompteRevue).
   Délai réaliste de 0,8 à 1,5 s sur chaque appel pour montrer les états de chargement.
 */
 export type MethodeConnexion = 'sage' | 'google' | 'email'
@@ -167,15 +168,40 @@ async function connexionDemo(methode: MethodeConnexion) {
   return compte
 }
 
+/*
+  Compte démo de revue (seul vrai appel réseau de Nudge) : les identifiants sont vérifiés
+  par la fonction serveur api/demo-login.ts, ils ne sont jamais écrits dans le code du navigateur.
+  Si c'est bon, le compte est recréé dans ce navigateur avec l'onboarding terminé
+  (Sage connecté, boîte mail reliée, invitation déjà vue) : arrivée directe sur le tableau de bord.
+*/
+async function connexionCompteRevue(email: string, motDePasse: string): Promise<Compte | null> {
+  try {
+    const reponse = await fetch('/api/demo-login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email, motDePasse }),
+    })
+    if (!reponse.ok) return null
+    const { profil } = (await reponse.json()) as { profil: Cabinet & { email: string } }
+    const compte: Compte = { ...profil, empreinte: '', sage: true, boiteMail: 'outlook', invitationFaite: true }
+    enregistrer(compte)
+    return compte
+  } catch {
+    // Réseau coupé ou fonction absente : traité comme des identifiants incorrects
+    return null
+  }
+}
+
 export async function seConnecter(methode: MethodeConnexion, email = '', motDePasse = ''): Promise<Compte> {
   if (methode !== 'email') return connexionDemo(methode)
   await attendre()
   const adresse = normaliser(email)
-  const compte = lireComptes()[adresse]
+  const local = lireComptes()[adresse]
+  const localOk = local?.empreinte && local.empreinte === (await empreinte(adresse, motDePasse))
+  // Pas de compte local valide : on tente le compte démo côté serveur
+  const compte = localOk ? local : await connexionCompteRevue(adresse, motDePasse)
   // Même message que le compte existe ou non : on ne révèle pas quels emails sont inscrits
-  if (!compte || !compte.empreinte || compte.empreinte !== (await empreinte(adresse, motDePasse))) {
-    throw new IdentifiantsIncorrects()
-  }
+  if (!compte) throw new IdentifiantsIncorrects()
   ouvrirSession(compte, 'email')
   return compte
 }
