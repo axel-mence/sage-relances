@@ -40,8 +40,8 @@ Prérequis : [Node.js](https://nodejs.org) en version LTS (20 ou plus) et Git.
 
 1. Cloner le dépôt :
    ```bash
-   git clone https://github.com/axel-mence/sage-relances.git
-   cd sage-relances
+   git clone https://github.com/axel-mence/sage-x-nudge-relance.git
+   cd sage-x-nudge-relance
    ```
 2. Installer les dépendances :
    ```bash
